@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TV & Movies">
+<meta name="theme-color" content="#0f1117">
+<meta name="format-detection" content="telephone=no">
+<title>📺 Pat's TV & Movie Tracker 2026</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d2e;
+    --card2: #22253a;
+    --accent: #e50000;
+    --accent2: #ffd700;
+    --text: #e8e8f0;
+    --muted: #8b8fa8;
+    --border: #2e3155;
+    --netflix: #e50914;
+    --hbo: #5822db;
+    --hulu: #1ce783;
+    --prime: #00a8e0;
+    --apple: #555;
+    --disney: #113ccf;
+    --paramount: #0064ff;
+    --peacock: #f06c00;
+    --fox: #e8a000;
+    --abc: #003087;
+    --cbs: #003087;
+    --nbc: #d4001b;
+    --starz: #000;
+    --amcplus: #c8002a;
+    --fx: #141414;
+    --bravo: #c80082;
+    --watching: #22c55e;
+    --mylist: #3b82f6;
+    --completed: #8b5cf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+  
+  /* Header */
+  .header { background: linear-gradient(135deg, #0f1117 0%, #1a0a2e 100%); padding: 20px 24px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 1.6rem; font-weight: 800; }
+  .header h1 span { color: var(--accent); }
+  .updated { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); background: var(--card); overflow-x: auto; }
+  .tab { padding: 14px 22px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--muted); white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+  .tab:hover { color: var(--text); background: var(--card2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Controls bar */
+  .controls { display: flex; gap: 10px; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+  .controls label { font-size: 0.8rem; color: var(--muted); }
+  .controls select, .controls input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+  .controls input { width: 200px; }
+  .controls input::placeholder { color: var(--muted); }
+  .btn-sort { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+  .btn-sort:hover, .btn-sort.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Content panels */
+  .panel { display: none; padding: 20px; }
+  .panel.active { display: block; }
+
+  /* Section title */
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--accent2); margin-bottom: 14px; margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Table */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 28px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead { background: var(--card2); }
+  th { padding: 10px 12px; text-align: left; font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; cursor: pointer; user-select: none; }
+  th:hover { color: var(--text); }
+  th .sort-arrow { display: inline-block; margin-left: 4px; opacity: 0.4; }
+  th.sorted .sort-arrow { opacity: 1; color: var(--accent); }
+  td { padding: 9px 12px; border-top: 1px solid var(--border); vertical-align: middle; }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+
+  /* Show name cell */
+  .show-name { font-weight: 600; color: var(--text); }
+  .latest-ep { font-size: 0.7rem; color: var(--accent2); font-weight: 700; margin-top: 2px; }
+  .show-desc { font-size: 0.7rem; color: var(--muted); margin-top: 2px; max-width: 280px; }
+
+  /* Service badges */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap; }
+  .badge-netflix { background: var(--netflix); color: #fff; }
+  .badge-hbo, .badge-max { background: var(--hbo); color: #fff; }
+  .badge-hulu { background: #111; color: var(--hulu); border: 1px solid var(--hulu); }
+  .badge-prime { background: #111; color: var(--prime); border: 1px solid var(--prime); }
+  .badge-apple { background: #333; color: #fff; }
+  .badge-disney { background: var(--disney); color: #fff; }
+  .badge-paramount { background: #001a70; color: #fff; }
+  .badge-peacock { background: #111; color: var(--peacock); border: 1px solid var(--peacock); }
+  .badge-fox { background: var(--fox); color: #000; }
+  .badge-abc { background: var(--abc); color: #fff; }
+  .badge-cbs { background: #2d2d7e; color: #fff; }
+  .badge-nbc { background: var(--nbc); color: #fff; }
+  .badge-starz { background: #000; color: #fff; border: 1px solid #444; }
+  .badge-amcplus { background: var(--amcplus); color: #fff; }
+  .badge-fx { background: #333; color: #fff; }
+  .badge-bravo { background: #6d0040; color: #fff; }
+  .badge-other { background: #333; color: #ccc; }
+
+  /* Status select */
+  .status-sel { border: none; border-radius: 5px; padding: 3px 7px; font-size: 0.72rem; font-weight: 700; cursor: pointer; min-width: 110px; }
+  .status-sel.watching { background: var(--watching); color: #000; }
+  .status-sel.mylist { background: var(--mylist); color: #fff; }
+  .status-sel.completed { background: var(--completed); color: #fff; }
+  .status-sel.none { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* Episode/Season selects */
+  .ep-sel { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 3px 6px; border-radius: 5px; font-size: 0.72rem; width: 58px; }
+
+  /* RT score */
+  .rt-score { font-weight: 700; font-size: 0.8rem; }
+  .rt-fresh { color: #fa320a; }
+  .rt-rotten { color: #6c757d; }
+  .rt-cert { color: #fa320a; }
+  .rt-none { color: var(--muted); }
+
+  /* Premiere cards */
+  .premiere-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .premiere-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; transition: transform 0.15s; }
+  .premiere-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .premiere-card .date { font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .premiere-card .title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .premiere-card .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .premiere-card .desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  /* News section */
+  .news-grid { display: grid; gap: 14px; }
+  .news-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; border-left: 4px solid var(--accent); }
+  .news-card .news-date { font-size: 0.68rem; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .news-card .news-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+  .news-card .news-body { font-size: 0.8rem; color: #c0c0d0; line-height: 1.6; }
+  .news-card a { color: var(--accent2); text-decoration: none; }
+  .news-card a:hover { text-decoration: underline; }
+  .news-tag { display: inline-block; padding: 2px 7px; border-radius: 3px; font-size: 0.65rem; font-weight: 700; margin-right: 6px; text-transform: uppercase; }
+  .tag-cancel { background: #7f1d1d; color: #fca5a5; }
+  .tag-premiere { background: #1e3a5f; color: #93c5fd; }
+  .tag-renewal { background: #14532d; color: #86efac; }
+  .tag-casting { background: #4a1d96; color: #c4b5fd; }
+  .tag-news { background: #3d2c00; color: var(--accent2); }
+  .tag-death { background: #374151; color: #d1d5db; }
+
+  /* Tooltip for show description */
+  .info-icon { display: inline-block; width: 14px; height: 14px; background: var(--muted); color: #000; border-radius: 50%; text-align: center; font-size: 0.6rem; line-height: 14px; cursor: help; font-weight: 700; margin-left: 4px; vertical-align: middle; }
+
+  /* Stats bar */
+  .stats-bar { display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 20px; background: var(--card2); border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+  .stat-item { display: flex; align-items: center; gap: 6px; }
+  .stat-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 20px; color: var(--muted); font-size: 0.72rem; border-top: 1px solid var(--border); margin-top: 20px; }
+  .footer a { color: var(--muted); }
+
+  /* mobile tweaks */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.2rem; }
+    .controls input { width: 140px; }
+    th, td { padding: 7px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>📺 Pat's <span>TV &amp; Movie</span> Tracker 2026</h1>
+    <div class="updated">Updated: Week of July 10, 2026 &nbsp;·&nbsp; Sources: TVLine · Rotten Tomatoes · Hollywood Reporter · TV Insider</div>
+  </div>
+</div>
+
+<!-- Stats bar (dynamic) -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item"><div class="stat-dot" style="background:var(--watching)"></div><span id="stat-watching">0 Watching</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:var(--mylist)"></div><span id="stat-mylist">0 My List</span></div>
+  <div class="stat-item"><div class="stat-dot" style="background:var(--completed)"></div><span id="stat-completed">0 Completed</span></div>
+  <div class="stat-item" style="margin-left:auto;color:var(--muted)">🎬 Click any status to track your viewing</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('tv')">📺 TV Shows</div>
+  <div class="tab" onclick="showTab('tv-premieres')">🌟 TV Premieres</div>
+  <div class="tab" onclick="showTab('fall')">🍂 Fall 2026 Preview</div>
+  <div class="tab" onclick="showTab('movies')">🎬 Movies in Theaters</div>
+  <div class="tab" onclick="showTab('movie-premieres')">🎥 Coming to Theaters</div>
+  <div class="tab" onclick="showTab('news')">📰 This Week's News</div>
+</div>
+
+<!-- ============ TV SHOWS ============ -->
+<div id="tab-tv" class="panel active">
+  <div class="controls">
+    <label>Filter:</label>
+    <input type="text" id="tv-search" placeholder="🔍 Search shows..." oninput="filterTV()">
+    <label>Service:</label>
+    <select id="tv-service" onchange="filterTV()">
+      <option value="">All Services</option>
+      <option value="netflix">Netflix</option>
+      <option value="hbo">HBO / Max</option>
+      <option value="hulu">Hulu</option>
+      <option value="prime">Prime Video</option>
+      <option value="apple">Apple TV+</option>
+      <option value="disney">Disney+</option>
+      <option value="paramount">Paramount+</option>
+      <option value="peacock">Peacock</option>
+      <option value="starz">Starz</option>
+      <option value="fox">Fox</option>
+      <option value="abc">ABC</option>
+      <option value="cbs">CBS</option>
+      <option value="nbc">NBC</option>
+      <option value="fx">FX / FXX</option>
+      <option value="amcplus">AMC+</option>
+      <option value="bravo">Bravo</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Status:</label>
+    <select id="tv-status-filter" onchange="filterTV()">
+      <option value="">All</option>
+      <option value="watching">Watching</option>
+      <option value="mylist">My List</option>
+      <option value="completed">Completed</option>
+    </select>
+    <button class="btn-sort" onclick="resetFilters('tv')">Reset</button>
+  </div>
+
+  <div style="padding:16px 20px 0">
+    <div class="section-title">🔴 Currently Airing — July 10, 2026</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table id="tv-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('tv-table',0)" data-col="0">Show <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('tv-table',1)" data-col="1">Service <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('tv-table',2)" data-col="2">Premiere Date <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('tv-table',3)" data-col="3">RT% <span class="sort-arrow">↕</span></th>
+          <th>Status</th>
+          <th>Season</th>
+          <th>Episode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows injected by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ TV PREMIERES ============ -->
+<div id="tab-tv-premieres" class="panel">
+  <div style="padding:16px 20px 0">
+    <div class="section-title">🌟 This Week's Premieres & Finales — Now Streaming!</div>
+  </div>
+  <div class="premiere-grid" id="premiere-grid" style="padding:0 20px 20px"></div>
+
+  <div style="padding:0 20px 0">
+    <div class="section-title">📅 Rest of July – December 2026 Upcoming Premieres</div>
+  </div>
+  <div class="premiere-grid" id="upcoming-grid" style="padding:0 20px 20px"></div>
+
+  <div style="padding:0 20px 0">
+    <div class="section-title">📌 2026 TBD — No Date Yet</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table id="tbd-table">
+      <thead><tr><th>Show</th><th>Service</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><div class="show-name">The Diplomat S4</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">Dune: Prophecy S2</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">Emily in Paris S6</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">The Gilded Age S4</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">The Witcher S5</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Final Season</td></tr>
+        <tr><td><div class="show-name">Outlander: Blood of My Blood S2</div></td><td><span class="badge badge-other">Starz</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">My Life With the Walter Boys S3</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">Monster: The Lizzie Borden Story</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Limited Series</td></tr>
+        <tr><td><div class="show-name">Lupin S4</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Date TBD</td></tr>
+        <tr><td><div class="show-name">Pride and Prejudice</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">New Series</td></tr>
+        <tr><td><div class="show-name">Untitled Larry David Project</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">TBD</td></tr>
+        <tr><td><div class="show-name">War</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">TBD</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ FALL TV ============ -->
+<div id="tab-fall" class="panel">
+  <div style="padding:16px 20px 0">
+    <div class="section-title">🍂 New Shows — Fall 2026 / 2026-27 Season</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table>
+      <thead><tr><th>New Show</th><th>Network</th><th>Timeslot</th><th>Premiere</th><th>Cast</th><th>Status</th><th>Season</th><th>Episode</th></tr></thead>
+      <tbody id="fall-new-shows"></tbody>
+    </table>
+  </div>
+  <div style="padding:0 20px 0">
+    <div class="section-title">📺 Returning Shows — Fall 2026 Primetime Grid</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table>
+      <thead><tr><th>Show</th><th>Network</th><th>Night / Time</th><th>Notes</th><th>Status</th><th>Season</th><th>Episode</th></tr></thead>
+      <tbody id="fall-returning"></tbody>
+    </table>
+  </div>
+  <div style="padding:0 20px 0">
+    <div class="section-title">🔴 Canceled in 2026</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table>
+      <thead><tr><th>Show</th><th>Network</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><div class="show-name">DMV</div></td><td><span class="badge badge-cbs">CBS</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">Watson</div></td><td><span class="badge badge-cbs">CBS</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">The Neighborhood</div></td><td><span class="badge badge-cbs">CBS</span></td><td style="color:#f87171;font-size:0.78rem">Canceled after S8</td></tr>
+        <tr><td><div class="show-name">Going Dutch</div></td><td><span class="badge badge-fox">Fox</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">The Great North</div></td><td><span class="badge badge-fox">Fox</span></td><td style="color:#f87171;font-size:0.78rem">Canceled after S6</td></tr>
+        <tr><td><div class="show-name">Brilliant Minds</div></td><td><span class="badge badge-nbc">NBC</span></td><td style="color:#f87171;font-size:0.78rem">Canceled after S2</td></tr>
+        <tr><td><div class="show-name">Stumble</div></td><td><span class="badge badge-nbc">NBC</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">The Boroughs</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:#f87171;font-size:0.78rem">Canceled after S1 (despite #2 streaming ranking)</td></tr>
+        <tr><td><div class="show-name">Godfather of Harlem</div></td><td><span class="badge badge-other">MGM+</span></td><td style="color:#f87171;font-size:0.78rem">Canceled after S4 (July 1) — 2-hour finale movie to wrap the story</td></tr>
+        <tr><td><div class="show-name">Acapulco</div></td><td><span class="badge badge-apple">Apple TV+</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">La Brea</div></td><td><span class="badge badge-nbc">NBC</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">Laid</div></td><td><span class="badge badge-peacock">Peacock</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">The Last Frontier</div></td><td><span class="badge badge-apple">Apple TV+</span></td><td style="color:#f87171;font-size:0.78rem">Canceled</td></tr>
+        <tr><td><div class="show-name">All American</div></td><td><span class="badge badge-other">CW</span></td><td style="color:#f87171;font-size:0.78rem">Final season premieres July 13</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ MOVIES IN THEATERS ============ -->
+<div id="tab-movies" class="panel">
+  <div class="controls">
+    <input type="text" id="movie-search" placeholder="🔍 Search movies..." oninput="filterMovies()">
+    <label>Sort:</label>
+    <button class="btn-sort active" id="msort-pop" onclick="sortMoviesBy('pop')">Most Popular</button>
+    <button class="btn-sort" id="msort-rt" onclick="sortMoviesBy('rt')">RT Score</button>
+    <button class="btn-sort" id="msort-date" onclick="sortMoviesBy('date')">Opening Date</button>
+  </div>
+  <div style="padding:16px 20px 0">
+    <div class="section-title">🎬 Now In Theaters</div>
+  </div>
+  <div class="tbl-wrap" style="margin:0 20px 24px">
+    <table id="movies-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('movies-table',0)" data-col="0">Movie <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('movies-table',1)" data-col="1">Opened <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('movies-table',2)" data-col="2">RT% <span class="sort-arrow">↕</span></th>
+          <th onclick="sortTable('movies-table',3)" data-col="3">Genre <span class="sort-arrow">↕</span></th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="movies-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============ MOVIE PREMIERES ============ -->
+<div id="tab-movie-premieres" class="panel">
+  <div style="padding:16px 20px 0">
+    <div class="section-title">🎥 Coming to Theaters &amp; Streaming — July 2026</div>
+  </div>
+  <div class="premiere-grid" id="movie-premiere-grid" style="padding:0 20px 20px"></div>
+</div>
+
+<!-- ============ NEWS ============ -->
+<div id="tab-news" class="panel">
+  <div style="padding:4px 0 0">
+    <div class="section-title">📰 Week of July 10, 2026 — TV & Movie News</div>
+  </div>
+  <div class="news-grid" id="news-grid"></div>
+</div>
+
+<div class="footer">
+  Sources: <a href="https://www.tvline.com" target="_blank">TVLine</a> · <a href="https://editorial.rottentomatoes.com/article/tv-premiere-dates-2026/" target="_blank">Rotten Tomatoes</a> · <a href="https://www.hollywoodreporter.com/lists/2026-tv-premiere-dates-calendar/" target="_blank">Hollywood Reporter</a>
+  &nbsp;·&nbsp; Tracker auto-saves your watching status &amp; episode progress.
+</div>
+
+<script>
+// ==================== DATA ====================
+
+const TV_SHOWS = [
+  // Currently Airing
+  { title: "House of the Dragon", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-21", season: 3, ep: "S3E3", rt: 82, desc: "Season 3! Targaryen civil war continues — E3 aired July 5, E4 airs July 12. Sunday nights.", current: true },
+  { title: "Silo", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-07-03", season: 3, ep: "S3E2", rt: null, desc: "Season 3! New mayor Juliette can't remember anything from her time outside — or her past. New episode dropped July 10. Fridays.", current: true },
+  { title: "Survival of the Thickest", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-02", season: 3, ep: "FINAL SEASON — All Eps Out", rt: null, desc: "Final season, 8-episode binge dropped July 2. Mavis and Luca embark on starting a family.", current: true },
+  { title: "Elle", service: "prime", serviceLabel: "Prime Video", premiere: "2026-07-01", season: 1, ep: "All Eps Out", rt: null, desc: "Legally Blonde prequel — young Elle Woods in high school. Already renewed for Season 2!", current: true },
+  { title: "The Bear", service: "hulu", serviceLabel: "Hulu", premiere: "2026-06-25", season: 5, ep: "S5 FINALE", rt: 97, desc: "Final season — all 8 episodes streaming. A legendary run ends.", current: true },
+  { title: "Avatar: The Last Airbender", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-25", season: 2, ep: "All Eps Out", rt: 88, desc: "Live-action Season 2 — all 7 episodes streaming on Netflix.", current: true },
+  { title: "Avatar: Fire and Ash", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-24", season: 3, ep: "All Eps Out", rt: null, desc: "Avatar S3 (filmed back-to-back with S2) — the epic conclusion, streaming now.", current: true },
+  { title: "Cape Fear", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-06-05", season: 1, ep: "S1E6", rt: 76, desc: "Amy Adams, Patrick Wilson, Javier Bardem. New episode dropped July 10 as the Bowdens' nightmare escalates. Fridays.", current: true },
+  { title: "The Vampire Lestat (Interview w/ the Vampire S3)", service: "amcplus", serviceLabel: "AMC", premiere: "2026-06-07", season: 3, ep: "S3E5", rt: 100, desc: "100% RT! AMC Sunday nights — series-confirmed Season 3 finale airs July 19.", current: true },
+  { title: "Sugar", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-06-19", season: 2, ep: "S2E4", rt: null, desc: "Colin Farrell neo-noir detective drama. New episode dropped July 10. Fridays on Apple TV+.", current: true },
+  { title: "Sweet Magnolias", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-11", season: 5, ep: "All Eps Out", rt: null, desc: "All 10 episodes dropped Jun 11.", current: true },
+  { title: "Dutton Ranch", service: "paramount", serviceLabel: "Paramount+", premiere: "2026-05-15", season: 1, ep: "S1 FINALE", rt: null, desc: "Season 1 finale aired July 3 — Rip and Beth face a standoff over Beulah's herd. Already renewed for Season 2!", current: true },
+  { title: "The Capture", service: "peacock", serviceLabel: "Peacock", premiere: "2026-06-18", season: 3, ep: "All Eps Out", rt: null, desc: "6-episode binge dropped Jun 18.", current: true },
+  { title: "I Will Find You", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-18", season: 1, ep: null, rt: null, desc: "Sam Worthington. Father breaks out of prison to find his son. 8-ep binge.", current: true },
+  { title: "The Listeners", service: "starz", serviceLabel: "Starz", premiere: "2026-06-12", season: 1, ep: "SERIES FINALE — Aired July 10", rt: 88, desc: "Rebecca Hall hears a mysterious hum. The limited series wrapped its run July 10 on Starz.", current: true },
+  { title: "Power Book III: Raising Kanan", service: "starz", serviceLabel: "Starz", premiere: "2026-06-12", season: 5, ep: "S5E5", rt: null, desc: "Final season. Raq's war with Kanan, Breeze and Stefano turns increasingly violent. New episode dropped July 10. Starz Fridays.", current: true },
+  { title: "The Agency", service: "paramount", serviceLabel: "Paramount+", premiere: "2026-06-21", season: 2, ep: "All Eps Out", rt: null, desc: "Michael Fassbender spy thriller. 10-episode season dropped all at once June 21.", current: true },
+  { title: "Not Suitable for Work", service: "hulu", serviceLabel: "Hulu", premiere: "2026-06-02", season: 1, ep: "S1 FINALE", rt: null, desc: "Mindy Kaling comedy Season 1 wrapped with a juicy cliffhanger. Creator talks big finale reveals.", current: true },
+  { title: "America's Sweethearts: Dallas Cowboys Cheerleaders", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-16", season: 3, ep: "All Eps Out", rt: null, desc: "7-episode season dropped Jun 16.", current: true },
+  { title: "The Boys", service: "prime", serviceLabel: "Prime Video", premiere: "2026-04-08", season: 5, ep: "SERIES FINALE", rt: 97, desc: "Series finale 'Blood and Bone' aired May 20 — the superhero satire has officially ended after 5 seasons.", current: true },
+  { title: "Hacks", service: "hbo", serviceLabel: "HBO Max", premiere: "2026-04-09", season: 5, ep: "SERIES FINALE", rt: 100, desc: "Jean Smart. Series finale aired May 28 — Deborah and Ava's bittersweet trip to Paris closed out a perfect run.", current: true },
+  { title: "Margo's Got Money Troubles", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-04-15", season: 2, ep: "Renewed for S2!", rt: 97, desc: "97% RT on Apple TV+. Season 1 wrapped its 10-episode run — Apple has officially ordered Season 2.", current: true },
+  { title: "Spider-Noir", service: "prime", serviceLabel: "Prime Video", premiere: "2026-05-27", season: 1, ep: "S1E6", rt: 91, desc: "Nicolas Cage as Spider-Man Noir. Weekly.", current: true },
+  { title: "Stranger Things: Tales From '85", service: "netflix", serviceLabel: "Netflix", premiere: "2026-04-23", season: 1, ep: null, rt: null, desc: "Stranger Things spin-off anthology.", current: true },
+  { title: "Good Omens", service: "prime", serviceLabel: "Prime Video", premiere: "2026-05-13", season: 3, ep: "S3 FINALE", rt: null, desc: "Final season has wrapped its 6-episode run. Prime Video.", current: true },
+  { title: "Rick and Morty", service: "other", serviceLabel: "Adult Swim", premiere: "2026-05-24", season: 9, ep: "S9E6", rt: null, desc: "Sunday nights on Adult Swim — Season 9 finale confirmed for July 26, followed by spinoff special 'President Curtis.'", current: true },
+  { title: "The Testaments", service: "hulu", serviceLabel: "Hulu", premiere: "2026-04-08", season: 1, ep: "S1E13", rt: 87, desc: "Handmaid's Tale sequel. 87% RT. Hulu.", current: true },
+  { title: "Euphoria", service: "hbo", serviceLabel: "HBO Max", premiere: "2026-04-12", season: 3, ep: "S3E11", rt: 40, desc: "Controversial S3 — only 40% RT. Sunday nights.", current: true },
+  { title: "Malcolm in the Middle: Life's Still Unfair", service: "hulu", serviceLabel: "Hulu", premiere: "2026-04-10", season: 1, ep: null, rt: 80, desc: "Revival limited series. Hulu.", current: true },
+  { title: "Clarkson's Farm", service: "prime", serviceLabel: "Prime Video", premiere: "2026-06-03", season: 5, ep: "All Eps Out", rt: null, desc: "All episodes dropped. Final season.", current: true },
+  { title: "Star Wars: Maul – Shadow Lord", service: "disney", serviceLabel: "Disney+", premiere: "2026-04-06", season: 1, ep: "S1E13", rt: 100, desc: "100% RT. Monday nights on Disney+ — entering the final stretch.", current: true },
+  { title: "Legend of Vox Machina", service: "prime", serviceLabel: "Prime Video", premiere: "2026-06-03", season: 4, ep: "S4 FINALE", rt: null, desc: "Season 4 finale dropped June 24! The Vox Machina saga continues to deliver.", current: true },
+  { title: "Love Island", service: "peacock", serviceLabel: "Peacock", premiere: "2026-06-02", season: 8, ep: "S8E26", rt: null, desc: "Summer reality. Nightly on Peacock.", current: true },
+  { title: "The Season", service: "hulu", serviceLabel: "Hulu", premiere: "2026-06-17", season: 1, ep: "All Eps Out", rt: null, desc: "Hong Kong elite boating elite drama. 6-ep binge.", current: true },
+  { title: "From", service: "amcplus", serviceLabel: "AMC+", premiere: "2026-04-19", season: 4, ep: "S4E11", rt: null, desc: "Sci-fi horror mystery. AMC+ Sundays — deep into the mystery now.", current: true },
+  { title: "Life, Larry & the Pursuit of Unhappiness", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-26", season: 1, ep: "S1E3", rt: null, desc: "Larry David sketch comedy from Obama Productions, backed by Barack and Michelle Obama. New episode dropped July 10. HBO Fridays.", current: true },
+];
+
+const PREMIERES_JUNE = [
+  { date: "July 10", title: "Star City — Series Finale", service: "apple", serviceLabel: "Apple TV+", desc: "Season 1 finale streams today.", rt: null },
+  { date: "July 10", title: "The Listeners — Limited Series Finale", service: "starz", serviceLabel: "Starz", desc: "Rebecca Hall's hum-obsessed drama wraps its run today on Starz.", rt: 88 },
+  { date: "July 9", title: "Little House on the Prairie", service: "netflix", serviceLabel: "Netflix", desc: "New 8-episode reimagining of the classic frontier family drama, now streaming.", rt: null },
+  { date: "July 9", title: "The Five-Star Weekend", service: "other", serviceLabel: "Peacock", desc: "A celebrity chef (Jennifer Garner) invites three friends from different life stages for a weekend in Nantucket after a loss. D'Arcy Carden, Gemma Chan, Regina Hall, Chloë Sevigny and Timothy Olyphant co-star.", rt: null },
+  { date: "July 9", title: "Big Brother", service: "other", serviceLabel: "CBS", desc: "Season 28 kicks off — summer's biggest reality institution returns.", rt: null },
+  { date: "July 3", title: "Silo S3", service: "apple", serviceLabel: "Apple TV+", desc: "Season 3! New mayor Juliette can't remember anything from her time outside — or her past. Fridays.", rt: null },
+  { date: "July 3", title: "Dutton Ranch — S1 Finale", service: "paramount", serviceLabel: "Paramount+", desc: "Season 1 wraps with Rip and Beth facing a standoff over Beulah's herd. Already renewed for Season 2!", rt: null },
+  { date: "July 2", title: "Survival of the Thickest — Final Season", service: "netflix", serviceLabel: "Netflix", desc: "8-episode final season binge. Mavis leans into a life-changing new adventure as she and Luca start a family.", rt: null },
+  { date: "July 1", title: "Elle S1", service: "prime", serviceLabel: "Prime Video", desc: "Legally Blonde prequel series — young Elle Woods in high school. Already renewed for Season 2!", rt: null },
+];
+
+const UPCOMING = [
+  { date: "July 13, 2026", title: "All American — Final Season", service: "other", serviceLabel: "The CW", desc: "Two-hour Season 8 premiere kicks off the final season, 13 episodes total.", rt: null },
+  { date: "July 13, 2026", title: "Dancing With the Stars: The Next Pro", service: "abc", serviceLabel: "ABC", desc: "12 up-and-coming dancers compete for a pro spot on DWTS Season 35. Robert Irwin hosts.", rt: null },
+  { date: "July 13, 2026", title: "Rabbit Hole", service: "disney", serviceLabel: "Disney+/Hulu", desc: "36-member cast of content creators (Topper Guild, Zhong, Jesser) star in this 10-episode teen variety show.", rt: null },
+  { date: "July 13, 2026", title: "Murder 101", service: "prime", serviceLabel: "Prime Video", desc: "Based on the podcast — a high school class investigates decades-old cold cases with their teacher. 3-ep binge.", rt: null },
+  { date: "July 15, 2026", title: "Lucky", service: "apple", serviceLabel: "Apple TV+", desc: "A con artist (Anya Taylor-Joy) goes on the run after a heist goes sideways. Annette Bening, Timothy Olyphant co-star.", rt: null },
+  { date: "July 15, 2026", title: "Ride or Die", service: "prime", serviceLabel: "Prime Video", desc: "Octavia Spencer and Hannah Waddingham star as best friends — one of whom turns out to be an international assassin. 8-ep binge.", rt: null },
+  { date: "July 16, 2026", title: "The Hawk", service: "netflix", serviceLabel: "Netflix", desc: "Will Ferrell plays a washed-up golfer convinced he's one stroke from the greatest comeback ever. 10-ep binge.", rt: null },
+  { date: "July 19, 2026", title: "The Vampire Lestat — S3 Finale", service: "amcplus", serviceLabel: "AMC", desc: "The 100%-RT-rated season wraps its run. Sunday nights on AMC.", rt: 100 },
+  { date: "July 23, 2026", title: "Star Trek: Strange New Worlds S4", service: "paramount", serviceLabel: "Paramount+", desc: "The Enterprise crew returns for a fourth season.", rt: null },
+  { date: "July 24, 2026", title: "Quarterback S3", service: "netflix", serviceLabel: "Netflix", desc: "The NFL docuseries returns for a 7-episode third season.", rt: null },
+  { date: "Summer 2026", title: "My Life With the Walter Boys S3", service: "netflix", serviceLabel: "Netflix", desc: "Jackie Howard's story with the Walter Boys resumes! Exact date TBD this summer.", rt: null },
+  { date: "July 31, 2026", title: "Batman: Caped Crusader S2", service: "prime", serviceLabel: "Prime Video", desc: "10-episode second season of the acclaimed animated reimagining.", rt: null },
+  { date: "Aug 5, 2026", title: "Ted Lasso S4", service: "apple", serviceLabel: "Apple TV+", desc: "The beloved AFC Richmond coach is back! Season 4 of the Emmy darling drops August 5.", rt: null },
+  { date: "Aug 12, 2026", title: "Reacher S4", service: "prime", serviceLabel: "Prime Video", desc: "Alan Ritchson returns as Jack Reacher for a fourth season, premiering August 12.", rt: null },
+  { date: "August 2026", title: "Leanne S2", service: "netflix", serviceLabel: "Netflix", desc: "Chuck Lorre's hit comedy returns. Jaime Pressly guest stars, reuniting with co-star Kristen Johnston (Mom reunion!).", rt: null },
+  { date: "Sept 2026", title: "The Drop: A Snowfall Saga", service: "fx", serviceLabel: "FX/Hulu", desc: "Snowfall spinoff gets a September premiere date on FX and Hulu. The L.A. crack epidemic story continues.", rt: null },
+  { date: "Sept 14, 2026", title: "78th Primetime Emmy Awards", service: "other", serviceLabel: "NBC", desc: "Nominations are in! The Pitt leads with 25 noms, Hacks set a comedy record with 24 for its final season, Pluribus scored 18. Mariska Hargitay hosts, live on NBC & Peacock.", rt: null },
+  { date: "Sept 16, 2026", title: "Neagley S1", service: "prime", serviceLabel: "Prime Video", desc: "Jack Reacher spinoff following Frances Neagley premieres September 16.", rt: null },
+  { date: "Sept 16, 2026", title: "Slow Horses S6", service: "apple", serviceLabel: "Apple TV+", desc: "Gary Oldman's acclaimed spy drama returns for a sixth season September 16.", rt: null },
+  { date: "Sept 17, 2026", title: "The Traitors: New Blood", service: "other", serviceLabel: "NBC", desc: "Civilian version of the hit format — everyday Americans compete at a Scottish castle for $250K. Alan Cumming hosts.", rt: null },
+  { date: "Sept 24, 2026", title: "American Horror Story: 13", service: "fx", serviceLabel: "FX/Disney+", desc: "The Coven returns! Jessica Lange is back for her first AHS season since 2018, alongside Sarah Paulson, Emma Roberts and new additions Ariana Grande and John Waters.", rt: null },
+  { date: "Oct 6, 2026", title: "Bass x Machina", service: "netflix", serviceLabel: "Netflix", desc: "New Netflix series premiering October 6.", rt: null },
+  { date: "Dec 25, 2026", title: "Harry Potter and the Philosopher's Stone", service: "hbo", serviceLabel: "HBO Max", desc: "The long-awaited Harry Potter reboot begins Christmas Day on HBO Max.", rt: null },
+];
+
+const FALL_NEW_SHOWS = [
+  { title: "The Traitors: New Blood", network: "nbc", net: "NBC", slot: "Thu 8pm", premiere: "Sept 17, 2026", cast: "Alan Cumming (host)", desc: "Civilian version — everyday Americans compete at a Scottish castle for $250K." },
+  { title: "NCIS: New York", network: "cbs", net: "CBS", slot: "Tue 9pm", premiere: "Fall TBD", cast: "LL Cool J, Scott Caan", desc: "Sam Hanna moves to NYC; reunites with Scott Caan." },
+  { title: "Cupertino", network: "cbs", net: "CBS", slot: "Thu 10pm", premiere: "Fall TBD", cast: "Mike Colter, Rachel Keller, Busy Philipps", desc: "Legal drama set in Silicon Valley — lawyers take on the tech elite." },
+  { title: "Eternally Yours", network: "cbs", net: "CBS", slot: "Thu 8:30pm", premiere: "Fall TBD", cast: "Ed Weeks, Allegra Edwards", desc: "Vampire couple's 500-year marriage goes stale — dark comedy." },
+  { title: "Line of Fire", network: "nbc", net: "NBC", slot: "Mon 10pm", premiere: "Sept 21, 2026", cast: "Peter Krause, Hope Davis, Charlie Barnett", desc: "Family of FBI/Marshal/Secret Service agents cross professional boundaries." },
+  { title: "Newlyweds", network: "nbc", net: "NBC", slot: "Fri 8:30pm", premiere: "Oct 23, 2026", cast: "Tea Leoni, Tim Daly, Jamie Lee Curtis (recurring)", desc: "Later-in-life whirlwind marriage comedy. Madam Secretary reunion!" },
+  { title: "Einstein", network: "cbs", net: "CBS", slot: "TBD", premiere: "Midseason TBD", cast: "Matthew Gray Gubler, Melissa Fumero", desc: "Great-grandson of Albert Einstein helps police solve crimes." },
+  { title: "The Rockford Files", network: "nbc", net: "NBC", slot: "Thu 8pm", premiere: "Midseason TBD", cast: "David Boreanaz, Michaela McManus, Jacki Weaver", desc: "Newly paroled PI James Rockford back in L.A." },
+  { title: "The Rookie: North", network: "abc", net: "ABC", slot: "TBD", premiere: "Midseason TBD", cast: "Jay Ellis, Chris Sullivan, Karen Fukuhara", desc: "Rookie cop joins Pierce County PD after a home invasion." },
+  { title: "The Interrogator", network: "fox", net: "Fox", slot: "TBD", premiere: "Midseason TBD", cast: "Stephen Fry, Jenna Elfman", desc: "Ex-MI6 agent leads a team extracting info from dangerous criminals." },
+  { title: "Baywatch", network: "fox", net: "Fox", slot: "TBD", premiere: "Jan 2027", cast: "Stephen Amell, Shay Mitchell, Hassie Harrison", desc: "Hobie Buchannon (Amell) runs Baywatch. Livvy Dunne guest stars." },
+  { title: "Sunset P.I.", network: "nbc", net: "NBC", slot: "Mon 8:30pm", premiere: "Feb 2027", cast: "Jake Johnson, Jane Levy, Keith David", desc: "L.A. private eye comedy in the tradition of Philip Marlowe." },
+  { title: "Wordle", network: "nbc", net: "NBC", slot: "TBD", premiere: "Midseason TBD", cast: "Savannah Guthrie (host)", desc: "Game show based on the New York Times word puzzle phenomenon." },
+  { title: "Marriage Market", network: "fox", net: "Fox", slot: "TBD", premiere: "Midseason TBD", cast: "Whitney Cummings (host)", desc: "Real singles let family members choose their partners." },
+];
+
+const FALL_RETURNING = [
+  // ABC
+  { title: "Dancing with the Stars", network: "abc", net: "ABC", slot: "Mon 8pm", notes: "Returns Fall" },
+  { title: "9-1-1", network: "abc", net: "ABC", slot: "Wed 8pm", notes: "Returns Fall" },
+  { title: "Abbott Elementary", network: "abc", net: "ABC", slot: "Wed 9pm", notes: "Returns Fall" },
+  { title: "Doctor Odyssey", network: "abc", net: "ABC", slot: "Thu 9pm", notes: "Returns Fall" },
+  // CBS
+  { title: "NCIS", network: "cbs", net: "CBS", slot: "Mon 9pm", notes: "Returns Fall" },
+  { title: "FBI", network: "cbs", net: "CBS", slot: "Tue 8pm", notes: "Returns Fall" },
+  { title: "FBI: International", network: "cbs", net: "CBS", slot: "Tue 9pm", notes: "Returns Fall" },
+  { title: "FBI: Most Wanted", network: "cbs", net: "CBS", slot: "Tue 10pm", notes: "Returns Fall" },
+  { title: "Survivor", network: "cbs", net: "CBS", slot: "Wed 8pm", notes: "Returns Fall — S49" },
+  { title: "The Amazing Race", network: "cbs", net: "CBS", slot: "Wed 10pm", notes: "Returns Fall" },
+  { title: "Tracker", network: "cbs", net: "CBS", slot: "Sun 8pm", notes: "Returns Fall — S3" },
+  { title: "NCIS: Origins", network: "cbs", net: "CBS", slot: "Mon 10pm", notes: "Returns Fall" },
+  // FOX
+  { title: "The Simpsons", network: "fox", net: "Fox", slot: "Sun 8pm", notes: "Season 38" },
+  { title: "Family Guy", network: "fox", net: "Fox", slot: "Sun 9:30pm", notes: "Midseason" },
+  { title: "Bob's Burgers", network: "fox", net: "Fox", slot: "Sun 9pm", notes: "Midseason" },
+  { title: "Doc", network: "fox", net: "Fox", slot: "Tue 9pm", notes: "Returns Fall" },
+  { title: "Animal Control", network: "fox", net: "Fox", slot: "Wed 9pm", notes: "Returns Fall" },
+  // NBC
+  { title: "Chicago Med", network: "nbc", net: "NBC", slot: "Wed 8pm", notes: "Returns Oct 7" },
+  { title: "Chicago Fire", network: "nbc", net: "NBC", slot: "Wed 9pm", notes: "Returns Oct 7" },
+  { title: "Chicago P.D.", network: "nbc", net: "NBC", slot: "Wed 10pm", notes: "Returns Oct 7" },
+  { title: "Law & Order", network: "nbc", net: "NBC", slot: "Thu 8pm", notes: "Returns Oct 8" },
+  { title: "Law & Order: SVU", network: "nbc", net: "NBC", slot: "Thu 9pm", notes: "Returns Oct 8 — S28" },
+  { title: "Law & Order: Organized Crime", network: "nbc", net: "NBC", slot: "Thu 10pm", notes: "Returns Fall" },
+  { title: "America's Got Talent", network: "nbc", net: "NBC", slot: "Tue 8pm", notes: "Summer/Fall — S21" },
+  { title: "American Ninja Warrior", network: "nbc", net: "NBC", slot: "Mon 9pm", notes: "Returns Summer" },
+];
+
+const MOVIES_IN_THEATERS = [
+  { title: "Evil Dead Burn", opened: "2026-07-10", rt: 90, genre: "Horror", pop: 10 },
+  { title: "Moana (Live-Action)", opened: "2026-07-10", rt: 37, genre: "Fantasy/Adventure", pop: 10 },
+  { title: "Minions & Monsters", opened: "2026-07-01", rt: 89, genre: "Animation/Comedy", pop: 9 },
+  { title: "Exit 8", opened: "2026-04-10", rt: 95, genre: "Horror/Thriller", pop: 7 },
+  { title: "The Christophers", opened: "2026-04-10", rt: 96, genre: "Drama", pop: 8 },
+  { title: "Mermaid", opened: "2026-04-08", rt: 90, genre: "Fantasy/Drama", pop: 10 },
+  { title: "Heads or Tails?", opened: "2026-04-10", rt: 86, genre: "Thriller", pop: 7 },
+  { title: "Hunting Matthew Nichols", opened: "2026-04-10", rt: 91, genre: "Documentary", pop: 6 },
+  { title: "The Travel Companion", opened: "2026-04-10", rt: 89, genre: "Drama", pop: 5 },
+  { title: "The Drama", opened: "2026-04-03", rt: 77, genre: "Drama", pop: 6 },
+  { title: "ChaO", opened: "2026-04-10", rt: 84, genre: "Drama", pop: 4 },
+  { title: "Hamlet", opened: "2026-04-10", rt: 72, genre: "Drama/Classic", pop: 5 },
+  { title: "You, Me & Tuscany", opened: "2026-04-10", rt: 69, genre: "Romance", pop: 6 },
+  { title: "Faces of Death", opened: "2026-04-10", rt: 69, genre: "Horror", pop: 4 },
+  { title: "The Super Mario Galaxy Movie", opened: "2026-04-01", rt: 43, genre: "Animation", pop: 10 },
+  { title: "A Great Awakening", opened: "2026-04-03", rt: 67, genre: "Documentary", pop: 5 },
+  { title: "The Stranger", opened: "2026-04-03", rt: 91, genre: "Thriller", pop: 7 },
+  { title: "Bunnylovr", opened: "2026-04-10", rt: 63, genre: "Drama", pop: 3 },
+];
+
+const MOVIE_PREMIERES = [
+  { date: "July 17", title: "The Odyssey", genre: "Epic/Adventure", rt: null, desc: "Christopher Nolan's adaptation of Homer's epic. Matt Damon and Anne Hathaway lead an ensemble including Zendaya, Charlize Theron, Robert Pattinson and Lupita Nyong'o.", studio: "Universal" },
+  { date: "July 17", title: "Heartstopper Forever", genre: "Drama/Romance", rt: null, desc: "A new school year for the Truham-Higgs gang — Nick and Charlie's relationship deepens as thoughts turn to life after graduation. Netflix.", studio: "Netflix" },
+  { date: "July 17", title: "They Fight", genre: "Drama", rt: null, desc: "A reformed ex-con (André Holland) mentors young boxers in Southeast D.C.; Wendell Pierce and Samira Wiley co-star. Hulu.", studio: "Hulu" },
+  { date: "July 24", title: "Motor City", genre: "Thriller", rt: null, desc: "Nearly dialogue-free 1970s Detroit revenge thriller starring Alan Ritchson, scored by Jack White.", studio: "Studio TBD" },
+  { date: "Late July", title: "Spider-Man: Brand New Day", genre: "Action/Superhero", rt: null, desc: "The fourth MCU Spider-Man film, set four years after No Way Home, directed by Destin Daniel Cretton.", studio: "Sony/Marvel" },
+  { date: "July 29", title: "The Devil Wears Prada 2", genre: "Comedy/Drama", rt: null, desc: "The long-awaited sequel returns to the world of Runway magazine. Disney+/Hulu.", studio: "20th Century" },
+  { date: "July 3 (Prime)", title: "Project Hail Mary", genre: "Sci-Fi", rt: 95, desc: "Ryan Gosling's best-reviewed movie ever — a science teacher must solve the riddle of a substance killing the sun. Now streaming on Prime Video.", studio: "Amazon MGM" },
+  { date: "July 2 (Hulu)", title: "Ready or Not 2: Here I Come", genre: "Horror/Comedy", rt: null, desc: "Grace (Samara Weaving) discovers the nightmare game has a next level, with her estranged sister at her side. Sarah Michelle Gellar co-stars.", studio: "Hulu" },
+  { date: "July 10 (HBO Max)", title: "The Long Walk", genre: "Thriller", rt: null, desc: "New to streaming on HBO Max this week.", studio: "HBO Max" },
+  { date: "July 10 (Peacock)", title: "Reminders of Him", genre: "Drama/Romance", rt: null, desc: "New to streaming on Peacock this week.", studio: "Peacock" },
+  { date: "June 19", title: "Toy Story 5", genre: "Animation", rt: null, desc: "Woody, Buzz, and the gang return in the long-awaited fifth installment from Pixar/Disney.", studio: "Disney/Pixar" },
+  { date: "June 19", title: "Leviticus", genre: "Drama", rt: 95, desc: "Certified Fresh with 95% RT — one of the season's most acclaimed films.", studio: "Indie" },
+  { date: "June 26", title: "Supergirl", genre: "Action/Superhero", rt: null, desc: "DC's Supergirl gets her big-screen solo debut.", studio: "DC/WB" },
+  { date: "June 26", title: "Jackass: Best and Last", genre: "Comedy", rt: null, desc: "The final chapter of the beloved Jackass franchise.", studio: "Paramount" },
+  { date: "July (Netflix)", title: "In the Hand of Dante", genre: "Crime/Drama", rt: null, desc: "Oscar Isaac, Gal Gadot, Jason Momoa, Al Pacino. Writer helps mob boss steal Dante's manuscript. Netflix.", studio: "Netflix" },
+  { date: "July (Netflix)", title: "Little Brother", genre: "Comedy", rt: null, desc: "John Cena's perfect life disrupted by brother Eric Andre. Netflix.", studio: "Netflix" },
+  { date: "July 24 (Netflix)", title: "72 Hours", genre: "Comedy", rt: null, desc: "Kevin Hart joins a group of twenty-somethings on a wild bachelor party after being added to their group text.", studio: "Netflix" },
+];
+
+const NEWS = [
+  {
+    tag: "news", tagLabel: "Emmys 2026",
+    date: "July 10, 2026",
+    title: "Emmy Nominations Are In — The Pitt Leads With 25, Hacks Sets a Comedy Record With 24",
+    body: "The 78th Primetime Emmy nominations dropped this week, and HBO Max's medical drama The Pitt topped the field with 25 nods. Hacks wasn't far behind with 24 nominations for its fifth and final season — a new all-time record for a comedy series in a single year. Apple TV+'s freshman drama Pluribus impressed with 18 nominations, and its Jon Hamm vehicle Your Friends & Neighbors also scored a Best Drama Series nod for Season 2. Taylor Swift picked up her second-ever Emmy nomination for The Eras Tour: The Final Show, and Bad Bunny's Super Bowl Halftime Show earned 9 nods. The ceremony airs live Monday, September 14 on NBC and Peacock, hosted for the first time by Mariska Hargitay.",
+    source: "tvline"
+  },
+  {
+    tag: "casting", tagLabel: "AHS Returns",
+    date: "July 9, 2026",
+    title: "American Horror Story Sets September Return — Coven Reborn as 'AHS: 13' With Jessica Lange Back",
+    body: "FX has set Thursday, September 24 at 9 p.m. for the premiere of American Horror Story's 13th season, titled 'American Horror Story: 13.' Miss Robichaux's Academy has been rebuilt for a new chapter, and Ryan Murphy is bringing back Jessica Lange for her first AHS season since 2018's Apocalypse alongside Sarah Paulson (reprising Cordelia Goode), Evan Peters, Angela Bassett, Kathy Bates, Emma Roberts, Billie Lourd and Leslie Grossman. New additions include Ariana Grande, John Waters and Alex Consani. It streams on Disney+ internationally.",
+    source: "hollywoodreporter"
+  },
+  {
+    tag: "news", tagLabel: "Box Office",
+    date: "July 10, 2026",
+    title: "Moana Live-Action Opens to Disney's Worst Reviews Ever — Evil Dead Burn Counterprograms With a Franchise High",
+    body: "It's a tale of two openings this weekend. Disney's live-action Moana, starring Catherine Laga'aia with Dwayne Johnson reprising Maui, landed around 35-37% on Rotten Tomatoes — the worst score of any Disney live-action remake to date, with critics calling it unnecessary given how closely it mirrors the 2016 original (which arrived barely two years after Moana 2). Meanwhile Evil Dead Burn is having the opposite week: critics are calling it the goriest, nastiest entry in franchise history, and the Evil Dead series still hasn't had a single 'rotten' rated installment on either the critic or audience side — a rare feat for a long-running horror franchise.",
+    source: "rottentomatoes"
+  },
+  {
+    tag: "premiere", tagLabel: "Series Finales",
+    date: "July 10, 2026",
+    title: "The Listeners and Star City Both Wrap Up Today — Plus a Big Week of Streaming Premieres",
+    body: "Starz's The Listeners closed out its limited series run tonight, with Rebecca Hall's Claire finally losing herself in the mysterious hum. Apple TV+'s Star City also aired its Season 1 finale today. It's a busy stretch on the premiere side too: Netflix's Little House on the Prairie reimagining and Peacock's The Five-Star Weekend (starring Jennifer Garner) both dropped July 9, and CBS's Big Brother kicked off Season 28 the same night.",
+    source: "tvline"
+  },
+  {
+    tag: "renewal", tagLabel: "Renewed",
+    date: "July 8, 2026",
+    title: "Apple TV+ Renews Margo's Got Money Troubles for Season 2",
+    body: "Apple's 97%-RT freshman comedy Margo's Got Money Troubles is coming back for a second season, the streamer confirmed this week — good news for fans who devoured the 10-episode first season. Elsewhere, Netflix confirmed The Lincoln Lawyer will conclude with its upcoming fifth season, closing out the legal drama on its own terms rather than an abrupt cancellation.",
+    source: "tvline"
+  },
+  {
+    tag: "casting", tagLabel: "Casting News",
+    date: "July 8, 2026",
+    title: "Raven-Symoné and More Set to Return for The Cheetah Girls: Next Gen",
+    body: "Raven-Symoné is reuniting with the Cheetah Girls universe for a new generation-spanning project, joined by a new musical foursome rounding out the cast. Full details are still emerging, but it's the latest example of Disney leaning into 2000s nostalgia IP this year.",
+    source: "tvline"
+  },
+  {
+    tag: "news", tagLabel: "Looking Ahead",
+    date: "July 6, 2026",
+    title: "Next Week on the Calendar: All American's Final Season, DWTS Spinoff, and Rabbit Hole",
+    body: "The CW's All American begins its final season Monday, July 13 with a two-hour premiere (13 episodes total). The same night, ABC launches Dancing With the Stars: The Next Pro, a competition series in which 12 up-and-coming dancers vie for a pro spot on DWTS Season 35, hosted by Robert Irwin. Disney+/Hulu's teen creator variety show Rabbit Hole and Prime Video's true-crime docuseries Murder 101 also drop July 13.",
+    source: "tvline"
+  },
+];
+
+// ==================== UTILS ====================
+const BADGE_MAP = {
+  netflix: "badge-netflix", hbo: "badge-hbo", max: "badge-hbo",
+  hulu: "badge-hulu", prime: "badge-prime", apple: "badge-apple",
+  disney: "badge-disney", paramount: "badge-paramount", peacock: "badge-peacock",
+  fox: "badge-fox", abc: "badge-abc", cbs: "badge-cbs", nbc: "badge-nbc",
+  starz: "badge-starz", amcplus: "badge-amcplus", fx: "badge-fx", bravo: "badge-bravo",
+  other: "badge-other"
+};
+
+function badge(service, label) {
+  const cls = BADGE_MAP[service] || "badge-other";
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function rtScore(rt) {
+  if (rt === null || rt === undefined) return '<span class="rt-none">—</span>';
+  const cls = rt >= 90 ? 'rt-cert' : rt >= 60 ? 'rt-fresh' : 'rt-rotten';
+  const icon = rt >= 90 ? '🍅' : rt >= 60 ? '🍅' : '🟢';
+  return `<span class="rt-score ${cls}">${rt}%</span>`;
+}
+
+function statusSel(id, type) {
+  const saved = localStorage.getItem(`${type}-status-${id}`) || '';
+  const cls = saved === 'watching' ? 'watching' : saved === 'mylist' ? 'mylist' : saved === 'completed' ? 'completed' : 'none';
+  return `<select class="status-sel ${cls}" id="sel-${type}-${id}" onchange="saveStatus('${id}','${type}',this)">
+    <option value="" ${saved===''?'selected':''}>— Track —</option>
+    <option value="watching" ${saved==='watching'?'selected':''}>👁 WATCHING</option>
+    <option value="mylist" ${saved==='mylist'?'selected':''}>📌 MY LIST</option>
+    <option value="completed" ${saved==='completed'?'selected':''}>✅ COMPLETED</option>
+  </select>`;
+}
+
+function saveStatus(id, type, sel) {
+  localStorage.setItem(`${type}-status-${id}`, sel.value);
+  const cls = sel.value === 'watching' ? 'watching' : sel.value === 'mylist' ? 'mylist' : sel.value === 'completed' ? 'completed' : 'none';
+  sel.className = `status-sel ${cls}`;
+  updateStats();
+}
+
+function seasonSel(id, type, maxS) {
+  const saved = localStorage.getItem(`${type}-season-${id}`) || '';
+  let opts = '<option value="">S#</option>';
+  for (let i=1; i<=Math.max(maxS||10, 12); i++) opts += `<option value="${i}" ${saved==i?'selected':''}>${i}</option>`;
+  return `<select class="ep-sel" onchange="localStorage.setItem('${type}-season-${id}',this.value)">${opts}</select>`;
+}
+
+function episodeSel(id, type) {
+  const saved = localStorage.getItem(`${type}-ep-${id}`) || '';
+  let opts = '<option value="">E#</option>';
+  for (let i=1; i<=30; i++) opts += `<option value="${i}" ${saved==i?'selected':''}>${i}</option>`;
+  return `<select class="ep-sel" onchange="localStorage.setItem('${type}-ep-${id}',this.value)">${opts}</select>`;
+}
+
+function updateStats() {
+  let w=0, m=0, c=0;
+  document.querySelectorAll('.status-sel').forEach(s => {
+    if (s.value === 'watching') w++;
+    else if (s.value === 'mylist') m++;
+    else if (s.value === 'completed') c++;
+  });
+  document.getElementById('stat-watching').textContent = `${w} Watching`;
+  document.getElementById('stat-mylist').textContent = `${m} My List`;
+  document.getElementById('stat-completed').textContent = `${c} Completed`;
+}
+
+function netBadge(n) {
+  const m = { abc:'badge-abc', cbs:'badge-cbs', nbc:'badge-nbc', fox:'badge-fox' };
+  return `<span class="badge ${m[n]||'badge-other'}">${n.toUpperCase()}</span>`;
+}
+
+// ==================== RENDER ====================
+
+function renderTV() {
+  const tbody = document.querySelector('#tv-table tbody');
+  tbody.innerHTML = TV_SHOWS.map((s, i) => {
+    const id = `tv-${i}`;
+    const ep = s.ep ? `<div class="latest-ep">Latest: ${s.ep}</div>` : '';
+    return `<tr data-service="${s.service}" data-title="${s.title.toLowerCase()}">
+      <td><div class="show-name">${s.title}</div>${ep}<div class="show-desc">${s.desc}</div></td>
+      <td>${badge(s.service, s.serviceLabel)}</td>
+      <td style="white-space:nowrap;font-size:0.78rem">${s.premiere}</td>
+      <td>${rtScore(s.rt)}</td>
+      <td>${statusSel(id, 'tv')}</td>
+      <td>${seasonSel(id, 'tv', s.season)}</td>
+      <td>${episodeSel(id, 'tv')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPremieres() {
+  const pg = document.getElementById('premiere-grid');
+  pg.innerHTML = PREMIERES_JUNE.map((p, i) => `
+    <div class="premiere-card">
+      <div class="date">📅 ${p.date}</div>
+      <div class="title">${p.title}</div>
+      <div class="meta">${badge(p.service, p.serviceLabel)}${p.rt ? rtScore(p.rt) : ''}</div>
+      <div class="desc">${p.desc}</div>
+    </div>`).join('');
+
+  const ug = document.getElementById('upcoming-grid');
+  ug.innerHTML = UPCOMING.map(u => `
+    <div class="premiere-card">
+      <div class="date">📅 ${u.date}</div>
+      <div class="title">${u.title}</div>
+      <div class="meta">${badge(u.service, u.serviceLabel)}${u.rt ? rtScore(u.rt) : ''}</div>
+      <div class="desc">${u.desc}</div>
+    </div>`).join('');
+}
+
+function renderFall() {
+  const ns = document.getElementById('fall-new-shows');
+  ns.innerHTML = FALL_NEW_SHOWS.map((s, i) => {
+    const id = `fall-${i}`;
+    return `<tr>
+      <td><div class="show-name">${s.title}</div><div class="show-desc">${s.desc}</div></td>
+      <td>${netBadge(s.network)}</td>
+      <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
+      <td style="white-space:nowrap;font-size:0.78rem;color:var(--accent2)">${s.premiere}</td>
+      <td style="font-size:0.75rem;color:var(--muted)">${s.cast}</td>
+      <td>${statusSel(id, 'fall')}</td>
+      <td>${seasonSel(id, 'fall', 1)}</td>
+      <td>${episodeSel(id, 'fall')}</td>
+    </tr>`;
+  }).join('');
+
+  const ret = document.getElementById('fall-returning');
+  ret.innerHTML = FALL_RETURNING.map((s, i) => {
+    const id = `ret-${i}`;
+    return `<tr>
+      <td><div class="show-name">${s.title}</div></td>
+      <td>${netBadge(s.network)}</td>
+      <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
+      <td style="font-size:0.75rem;color:var(--muted)">${s.notes}</td>
+      <td>${statusSel(id, 'ret')}</td>
+      <td>${seasonSel(id, 'ret', 1)}</td>
+      <td>${episodeSel(id, 'ret')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMovies() {
+  const tbody = document.getElementById('movies-tbody');
+  tbody.innerHTML = MOVIES_IN_THEATERS.map((m, i) => {
+    const id = `mov-${i}`;
+    return `<tr data-title="${m.title.toLowerCase()}">
+      <td><div class="show-name">${m.title}</div></td>
+      <td style="white-space:nowrap;font-size:0.78rem">${m.opened}</td>
+      <td>${rtScore(m.rt)}</td>
+      <td style="font-size:0.78rem;color:var(--muted)">${m.genre}</td>
+      <td>${statusSel(id, 'mov')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMoviePremieres() {
+  const g = document.getElementById('movie-premiere-grid');
+  g.innerHTML = MOVIE_PREMIERES.map(m => `
+    <div class="premiere-card">
+      <div class="date">🎬 ${m.date}</div>
+      <div class="title">${m.title}</div>
+      <div class="meta">
+        <span class="badge badge-other">${m.genre}</span>
+        ${m.rt ? rtScore(m.rt) : ''}
+        ${m.studio ? `<span style="font-size:0.7rem;color:var(--muted)">${m.studio}</span>` : ''}
+      </div>
+      <div class="desc">${m.desc}</div>
+    </div>`).join('');
+}
+
+function renderNews() {
+  const g = document.getElementById('news-grid');
+  const tagClass = { cancel:'tag-cancel', premiere:'tag-premiere', renewal:'tag-renewal', casting:'tag-casting', news:'tag-news', death:'tag-death' };
+  g.innerHTML = NEWS.map(n => `
+    <div class="news-card">
+      <div class="news-date"><span class="news-tag ${tagClass[n.tag]||'tag-news'}">${n.tagLabel}</span>${n.date}</div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-body">${n.body}</div>
+    </div>`).join('');
+}
+
+// ==================== TABS ====================
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ==================== FILTERS ====================
+function filterTV() {
+  const q = document.getElementById('tv-search').value.toLowerCase();
+  const svc = document.getElementById('tv-service').value;
+  const st = document.getElementById('tv-status-filter').value;
+  document.querySelectorAll('#tv-table tbody tr').forEach(row => {
+    const title = row.dataset.title || '';
+    const service = row.dataset.service || '';
+    const statusEl = row.querySelector('.status-sel');
+    const status = statusEl ? statusEl.value : '';
+    const matchQ = !q || title.includes(q);
+    const matchS = !svc || service === svc;
+    const matchSt = !st || status === st;
+    row.style.display = matchQ && matchS && matchSt ? '' : 'none';
+  });
+}
+
+function filterMovies() {
+  const q = document.getElementById('movie-search').value.toLowerCase();
+  document.querySelectorAll('#movies-table tbody tr').forEach(row => {
+    const title = row.dataset.title || '';
+    row.style.display = !q || title.includes(q) ? '' : 'none';
+  });
+}
+
+function resetFilters(type) {
+  if (type === 'tv') {
+    document.getElementById('tv-search').value = '';
+    document.getElementById('tv-service').value = '';
+    document.getElementById('tv-status-filter').value = '';
+    filterTV();
+  }
+}
+
+// ==================== SORT ====================
+function sortTable(tableId, col) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const th = table.querySelectorAll('th')[col];
+  const asc = th.dataset.asc !== 'true';
+  th.dataset.asc = asc;
+  table.querySelectorAll('th').forEach(t => { t.classList.remove('sorted'); t.querySelector('.sort-arrow') && (t.querySelector('.sort-arrow').textContent = '↕'); });
+  th.classList.add('sorted');
+  if (th.querySelector('.sort-arrow')) th.querySelector('.sort-arrow').textContent = asc ? '↑' : '↓';
+  rows.sort((a, b) => {
+    const av = a.cells[col]?.innerText.trim() || '';
+    const bv = b.cells[col]?.innerText.trim() || '';
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+let movieSortMode = 'pop';
+function sortMoviesBy(mode) {
+  movieSortMode = mode;
+  document.querySelectorAll('[id^="msort-"]').forEach(b => b.classList.remove('active'));
+  document.getElementById('msort-' + mode).classList.add('active');
+  const tbody = document.getElementById('movies-tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a, b) => {
+    if (mode === 'rt') {
+      const av = parseInt(a.cells[2]?.innerText) || 0;
+      const bv = parseInt(b.cells[2]?.innerText) || 0;
+      return bv - av;
+    } else if (mode === 'date') {
+      const av = a.cells[1]?.innerText.trim() || '';
+      const bv = b.cells[1]?.innerText.trim() || '';
+      return av.localeCompare(bv);
+    }
+    return 0; // pop = default order
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  renderTV();
+  renderPremieres();
+  renderFall();
+  renderMovies();
+  renderMoviePremieres();
+  renderNews();
+  updateStats();
+});
+</script>
+</body>
+</html>
