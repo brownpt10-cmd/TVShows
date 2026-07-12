@@ -177,6 +177,10 @@
     <h1>📺 Pat's <span>TV &amp; Movie</span> Tracker 2026</h1>
     <div class="updated">Updated: Week of July 10, 2026 &nbsp;·&nbsp; Sources: TVLine · Rotten Tomatoes · Hollywood Reporter · TV Insider</div>
   </div>
+  <div style="text-align:right;">
+    <div id="syncStatus" style="font-size:0.75rem;color:var(--muted);"></div>
+    <div id="profileLabel" style="font-size:0.75rem;color:var(--muted);cursor:pointer;text-decoration:underline;margin-top:4px;" title="Click to switch user" onclick="switchProfile()"></div>
+  </div>
 </div>
 
 <!-- Stats bar (dynamic) -->
@@ -632,10 +636,97 @@ function rtScore(rt) {
   return `<span class="rt-score ${cls}">${rt}%</span>`;
 }
 
-function statusSel(id, type) {
-  const saved = localStorage.getItem(`${type}-status-${id}`) || '';
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
+function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+// --- Google Sheets sync (multi-user, no login — replaces localStorage) ---
+const WEB_APP_URL = 'PASTE_YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE';
+const PROFILES = ['Pat', 'Charla', 'Nicole'];
+const PROFILE_KEY = 'tvtracker-profile';
+let PROFILE = localStorage.getItem(PROFILE_KEY);
+let REMOTE = {}; // id -> { status, season, episode }
+
+function ensureProfileSelected() {
+  return new Promise((resolve) => {
+    if (PROFILE && PROFILES.indexOf(PROFILE) !== -1) { resolve(); return; }
+    const overlay = document.createElement('div');
+    overlay.id = 'profileOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    overlay.innerHTML = `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px 32px;max-width:320px;text-align:center;">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:4px;">Who&rsquo;s watching?</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:18px;">Pick a name so Status/Season/Episode picks sync to the right person. Remembered on this device.</div>
+        ${PROFILES.map(p => `<button class="profile-btn" data-profile="${p}" style="display:block;width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:0.95rem;font-weight:600;cursor:pointer;">${p}</button>`).join('')}
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelectorAll('.profile-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        PROFILE = btn.dataset.profile;
+        localStorage.setItem(PROFILE_KEY, PROFILE);
+        overlay.remove();
+        resolve();
+      });
+    });
+  });
+}
+
+function switchProfile() {
+  localStorage.removeItem(PROFILE_KEY);
+  location.reload();
+}
+
+function setSyncStatus(msg, isError) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? '#dc2626' : 'var(--muted)';
+}
+
+function syncConfigured() {
+  return WEB_APP_URL && WEB_APP_URL.indexOf('PASTE_YOUR') !== 0;
+}
+
+async function loadRemoteData() {
+  if (!syncConfigured()) {
+    setSyncStatus('Sync not set up yet — showing defaults', true);
+    return;
+  }
+  try {
+    const res = await fetch(`${WEB_APP_URL}?user=${encodeURIComponent(PROFILE)}`, { method: 'GET' });
+    const rows = await res.json();
+    rows.forEach(r => { REMOTE[r.ID] = { status: r.Status || '', season: r.Season || '', episode: r.Episode || '' }; });
+    setSyncStatus(`Synced as ${PROFILE}`, false);
+  } catch (err) {
+    console.warn('TV Tracker: could not load synced data from Google Sheet, showing defaults.', err);
+    setSyncStatus('Sync unavailable — showing defaults', true);
+  }
+}
+
+function pushRemote(id, field, value, type, title) {
+  REMOTE[id] = REMOTE[id] || { status: '', season: '', episode: '' };
+  REMOTE[id][field.toLowerCase()] = value;
+  if (!syncConfigured()) return;
+  setSyncStatus('Saving…', false);
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ id, field, value, type, title, user: PROFILE })
+  }).then(() => setSyncStatus(`Synced as ${PROFILE}`, false))
+    .catch(err => {
+      console.warn('TV Tracker: change saved on this device but failed to sync to the Sheet.', err);
+      setSyncStatus('Saved on this device only — sync failed', true);
+    });
+}
+
+function getRemote(id, field, fallback) {
+  const r = REMOTE[id];
+  return (r && r[field]) || fallback;
+}
+
+function statusSel(id, type, title) {
+  const saved = getRemote(id, 'status', '');
   const cls = saved === 'watching' ? 'watching' : saved === 'mylist' ? 'mylist' : saved === 'completed' ? 'completed' : 'none';
-  return `<select class="status-sel ${cls}" id="sel-${type}-${id}" onchange="saveStatus('${id}','${type}',this)">
+  return `<select class="status-sel ${cls}" id="sel-${id}" onchange="saveStatus('${id}','${type}','${escAttr(title)}',this)">
     <option value="" ${saved===''?'selected':''}>— Track —</option>
     <option value="watching" ${saved==='watching'?'selected':''}>👁 WATCHING</option>
     <option value="mylist" ${saved==='mylist'?'selected':''}>📌 MY LIST</option>
@@ -643,25 +734,33 @@ function statusSel(id, type) {
   </select>`;
 }
 
-function saveStatus(id, type, sel) {
-  localStorage.setItem(`${type}-status-${id}`, sel.value);
+function saveStatus(id, type, title, sel) {
+  pushRemote(id, 'Status', sel.value, type, title);
   const cls = sel.value === 'watching' ? 'watching' : sel.value === 'mylist' ? 'mylist' : sel.value === 'completed' ? 'completed' : 'none';
   sel.className = `status-sel ${cls}`;
   updateStats();
 }
 
-function seasonSel(id, type, maxS) {
-  const saved = localStorage.getItem(`${type}-season-${id}`) || '';
+function seasonSel(id, type, title, maxS) {
+  const saved = getRemote(id, 'season', '');
   let opts = '<option value="">S#</option>';
   for (let i=1; i<=Math.max(maxS||10, 12); i++) opts += `<option value="${i}" ${saved==i?'selected':''}>${i}</option>`;
-  return `<select class="ep-sel" onchange="localStorage.setItem('${type}-season-${id}',this.value)">${opts}</select>`;
+  return `<select class="ep-sel" onchange="saveSeason('${id}','${type}','${escAttr(title)}',this)">${opts}</select>`;
 }
 
-function episodeSel(id, type) {
-  const saved = localStorage.getItem(`${type}-ep-${id}`) || '';
+function saveSeason(id, type, title, sel) {
+  pushRemote(id, 'Season', sel.value, type, title);
+}
+
+function episodeSel(id, type, title) {
+  const saved = getRemote(id, 'episode', '');
   let opts = '<option value="">E#</option>';
   for (let i=1; i<=30; i++) opts += `<option value="${i}" ${saved==i?'selected':''}>${i}</option>`;
-  return `<select class="ep-sel" onchange="localStorage.setItem('${type}-ep-${id}',this.value)">${opts}</select>`;
+  return `<select class="ep-sel" onchange="saveEpisode('${id}','${type}','${escAttr(title)}',this)">${opts}</select>`;
+}
+
+function saveEpisode(id, type, title, sel) {
+  pushRemote(id, 'Episode', sel.value, type, title);
 }
 
 function updateStats() {
@@ -686,16 +785,16 @@ function netBadge(n) {
 function renderTV() {
   const tbody = document.querySelector('#tv-table tbody');
   tbody.innerHTML = TV_SHOWS.map((s, i) => {
-    const id = `tv-${i}`;
+    const id = `tv-${slugify(s.title)}`;
     const ep = s.ep ? `<div class="latest-ep">Latest: ${s.ep}</div>` : '';
     return `<tr data-service="${s.service}" data-title="${s.title.toLowerCase()}">
       <td><div class="show-name">${s.title}</div>${ep}<div class="show-desc">${s.desc}</div></td>
       <td>${badge(s.service, s.serviceLabel)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.premiere}</td>
       <td>${rtScore(s.rt)}</td>
-      <td>${statusSel(id, 'tv')}</td>
-      <td>${seasonSel(id, 'tv', s.season)}</td>
-      <td>${episodeSel(id, 'tv')}</td>
+      <td>${statusSel(id, 'tv', s.title)}</td>
+      <td>${seasonSel(id, 'tv', s.title, s.season)}</td>
+      <td>${episodeSel(id, 'tv', s.title)}</td>
     </tr>`;
   }).join('');
 }
@@ -723,30 +822,30 @@ function renderPremieres() {
 function renderFall() {
   const ns = document.getElementById('fall-new-shows');
   ns.innerHTML = FALL_NEW_SHOWS.map((s, i) => {
-    const id = `fall-${i}`;
+    const id = `fall-${slugify(s.title)}`;
     return `<tr>
       <td><div class="show-name">${s.title}</div><div class="show-desc">${s.desc}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
       <td style="white-space:nowrap;font-size:0.78rem;color:var(--accent2)">${s.premiere}</td>
       <td style="font-size:0.75rem;color:var(--muted)">${s.cast}</td>
-      <td>${statusSel(id, 'fall')}</td>
-      <td>${seasonSel(id, 'fall', 1)}</td>
-      <td>${episodeSel(id, 'fall')}</td>
+      <td>${statusSel(id, 'fall', s.title)}</td>
+      <td>${seasonSel(id, 'fall', s.title, 1)}</td>
+      <td>${episodeSel(id, 'fall', s.title)}</td>
     </tr>`;
   }).join('');
 
   const ret = document.getElementById('fall-returning');
   ret.innerHTML = FALL_RETURNING.map((s, i) => {
-    const id = `ret-${i}`;
+    const id = `ret-${slugify(s.title)}`;
     return `<tr>
       <td><div class="show-name">${s.title}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
       <td style="font-size:0.75rem;color:var(--muted)">${s.notes}</td>
-      <td>${statusSel(id, 'ret')}</td>
-      <td>${seasonSel(id, 'ret', 1)}</td>
-      <td>${episodeSel(id, 'ret')}</td>
+      <td>${statusSel(id, 'ret', s.title)}</td>
+      <td>${seasonSel(id, 'ret', s.title, 1)}</td>
+      <td>${episodeSel(id, 'ret', s.title)}</td>
     </tr>`;
   }).join('');
 }
@@ -754,13 +853,13 @@ function renderFall() {
 function renderMovies() {
   const tbody = document.getElementById('movies-tbody');
   tbody.innerHTML = MOVIES_IN_THEATERS.map((m, i) => {
-    const id = `mov-${i}`;
+    const id = `mov-${slugify(m.title)}`;
     return `<tr data-title="${m.title.toLowerCase()}">
       <td><div class="show-name">${m.title}</div></td>
       <td style="white-space:nowrap;font-size:0.78rem">${m.opened}</td>
       <td>${rtScore(m.rt)}</td>
       <td style="font-size:0.78rem;color:var(--muted)">${m.genre}</td>
-      <td>${statusSel(id, 'mov')}</td>
+      <td>${statusSel(id, 'mov', m.title)}</td>
     </tr>`;
   }).join('');
 }
@@ -877,7 +976,11 @@ function sortMoviesBy(mode) {
 }
 
 // ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await ensureProfileSelected();
+  const profileLabelEl = document.getElementById('profileLabel');
+  if (profileLabelEl) profileLabelEl.textContent = `${PROFILE} (switch)`;
+  await loadRemoteData();
   renderTV();
   renderPremieres();
   renderFall();
