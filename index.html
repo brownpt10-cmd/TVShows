@@ -640,7 +640,7 @@ function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace
 function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
 // --- Google Sheets sync (multi-user, no login — replaces localStorage) ---
-const WEB_APP_URL = 'PASTE_YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyG57fRPgvG6AZXnCk6hktTPa1yQrogf2nqWQjw7d17VA9CpO1BGNQ0ImEDq5iApIZExw/exec';
 const PROFILES = ['Pat', 'Charla', 'Nicole'];
 const PROFILE_KEY = 'tvtracker-profile';
 let PROFILE = localStorage.getItem(PROFILE_KEY);
