@@ -175,7 +175,7 @@
 <div class="header">
   <div>
     <h1>📺 Pat's <span>TV &amp; Movie</span> Tracker 2026</h1>
-    <div class="updated">Updated: Week of July 10, 2026 &nbsp;·&nbsp; Sources: TVLine · Rotten Tomatoes · Hollywood Reporter · TV Insider</div>
+    <div class="updated">Updated: Week of July 12, 2026 &nbsp;·&nbsp; Sources: TVLine · Rotten Tomatoes · Hollywood Reporter · TV Insider · FlixPatrol</div>
   </div>
   <div style="text-align:right;">
     <div id="syncStatus" style="font-size:0.75rem;color:var(--muted);"></div>
@@ -199,6 +199,7 @@
   <div class="tab" onclick="showTab('movies')">🎬 Movies in Theaters</div>
   <div class="tab" onclick="showTab('movie-premieres')">🎥 Coming to Theaters</div>
   <div class="tab" onclick="showTab('news')">📰 This Week's News</div>
+  <div class="tab" onclick="showTab('trending')">🔥 Trending Now</div>
 </div>
 
 <!-- ============ TV SHOWS ============ -->
@@ -381,9 +382,18 @@
 <!-- ============ NEWS ============ -->
 <div id="tab-news" class="panel">
   <div style="padding:4px 0 0">
-    <div class="section-title">📰 Week of July 10, 2026 — TV & Movie News</div>
+    <div class="section-title">📰 Week of July 12, 2026 — TV & Movie News</div>
   </div>
   <div class="news-grid" id="news-grid"></div>
+</div>
+
+<!-- ============ TRENDING NOW ============ -->
+<div id="tab-trending" class="panel">
+  <div style="padding:4px 0 0">
+    <div class="section-title">🔥 Top 10 Movies by Streaming Service (FlixPatrol, U.S.)</div>
+    <div style="padding:0 20px 12px;font-size:0.75rem;color:var(--muted)">Each service pulls a slightly different snapshot date since FlixPatrol's charts don't refresh in sync — date noted per card.</div>
+  </div>
+  <div id="trending-grid" style="padding:0 20px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;"></div>
 </div>
 
 <div class="footer">
@@ -396,7 +406,10 @@
 
 const TV_SHOWS = [
   // Currently Airing
-  { title: "House of the Dragon", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-21", season: 3, ep: "S3E3", rt: 82, desc: "Season 3! Targaryen civil war continues — E3 aired July 5, E4 airs July 12. Sunday nights.", current: true },
+  { title: "Little House on the Prairie", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-09", season: 1, ep: "All Eps Out", rt: null, desc: "New 8-episode reimagining of the classic frontier family drama — full season dropped July 9.", current: true },
+  { title: "The Five-Star Weekend", service: "peacock", serviceLabel: "Peacock", premiere: "2026-07-09", season: 1, ep: "S1E2", rt: null, desc: "Jennifer Garner-led limited series — a celebrity chef invites three friends from different life stages for a weekend in Nantucket after a loss. D'Arcy Carden, Gemma Chan, Regina Hall, Chloë Sevigny and Timothy Olyphant co-star. 2-episode premiere dropped July 9.", current: true },
+  { title: "Big Brother", service: "other", serviceLabel: "CBS", premiere: "2026-07-09", season: 28, ep: "Ongoing", rt: null, desc: "Season 28 kicked off July 9 — summer's biggest reality institution, airing multiple nights weekly.", current: true },
+  { title: "House of the Dragon", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-21", season: 3, ep: "S3E4", rt: 82, desc: "Season 3! Targaryen civil war continues — E4 aired July 12. Sunday nights.", current: true },
   { title: "Silo", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-07-03", season: 3, ep: "S3E2", rt: null, desc: "Season 3! New mayor Juliette can't remember anything from her time outside — or her past. New episode dropped July 10. Fridays.", current: true },
   { title: "Survival of the Thickest", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-02", season: 3, ep: "FINAL SEASON — All Eps Out", rt: null, desc: "Final season, 8-episode binge dropped July 2. Mavis and Luca embark on starting a family.", current: true },
   { title: "Elle", service: "prime", serviceLabel: "Prime Video", premiere: "2026-07-01", season: 1, ep: "All Eps Out", rt: null, desc: "Legally Blonde prequel — young Elle Woods in high school. Already renewed for Season 2!", current: true },
@@ -404,7 +417,7 @@ const TV_SHOWS = [
   { title: "Avatar: The Last Airbender", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-25", season: 2, ep: "All Eps Out", rt: 88, desc: "Live-action Season 2 — all 7 episodes streaming on Netflix.", current: true },
   { title: "Avatar: Fire and Ash", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-24", season: 3, ep: "All Eps Out", rt: null, desc: "Avatar S3 (filmed back-to-back with S2) — the epic conclusion, streaming now.", current: true },
   { title: "Cape Fear", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-06-05", season: 1, ep: "S1E6", rt: 76, desc: "Amy Adams, Patrick Wilson, Javier Bardem. New episode dropped July 10 as the Bowdens' nightmare escalates. Fridays.", current: true },
-  { title: "The Vampire Lestat (Interview w/ the Vampire S3)", service: "amcplus", serviceLabel: "AMC", premiere: "2026-06-07", season: 3, ep: "S3E5", rt: 100, desc: "100% RT! AMC Sunday nights — series-confirmed Season 3 finale airs July 19.", current: true },
+  { title: "The Vampire Lestat (Interview w/ the Vampire S3)", service: "amcplus", serviceLabel: "AMC", premiere: "2026-06-07", season: 3, ep: "S3E6", rt: 100, desc: "100% RT! AMC Sunday nights — E6 aired July 12. Series-confirmed Season 3 finale airs July 19.", current: true },
   { title: "Sugar", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-06-19", season: 2, ep: "S2E4", rt: null, desc: "Colin Farrell neo-noir detective drama. New episode dropped July 10. Fridays on Apple TV+.", current: true },
   { title: "Sweet Magnolias", service: "netflix", serviceLabel: "Netflix", premiere: "2026-06-11", season: 5, ep: "All Eps Out", rt: null, desc: "All 10 episodes dropped Jun 11.", current: true },
   { title: "Dutton Ranch", service: "paramount", serviceLabel: "Paramount+", premiere: "2026-05-15", season: 1, ep: "S1 FINALE", rt: null, desc: "Season 1 finale aired July 3 — Rip and Beth face a standoff over Beulah's herd. Already renewed for Season 2!", current: true },
@@ -522,6 +535,7 @@ const FALL_RETURNING = [
 ];
 
 const MOVIES_IN_THEATERS = [
+  { title: "The Invite", opened: "2026-07-10", rt: 96, genre: "Comedy", pop: 9 },
   { title: "Evil Dead Burn", opened: "2026-07-10", rt: 90, genre: "Horror", pop: 10 },
   { title: "Moana (Live-Action)", opened: "2026-07-10", rt: 37, genre: "Fantasy/Adventure", pop: 10 },
   { title: "Minions & Monsters", opened: "2026-07-01", rt: 89, genre: "Animation/Comedy", pop: 9 },
@@ -599,19 +613,37 @@ const NEWS = [
     source: "tvline"
   },
   {
-    tag: "casting", tagLabel: "Casting News",
-    date: "July 8, 2026",
-    title: "Raven-Symoné and More Set to Return for The Cheetah Girls: Next Gen",
-    body: "Raven-Symoné is reuniting with the Cheetah Girls universe for a new generation-spanning project, joined by a new musical foursome rounding out the cast. Full details are still emerging, but it's the latest example of Disney leaning into 2000s nostalgia IP this year.",
+    tag: "news", tagLabel: "Movies",
+    date: "July 10, 2026",
+    title: "A24's The Invite Is the Best-Reviewed Studio Comedy of the Year",
+    body: "Olivia Wilde's R-rated ensemble comedy — starring Seth Rogen, Wilde, Penélope Cruz and Edward Norton — expanded wide July 10 to a 96% Certified Fresh Tomatometer score (92% audience) across nearly 200 reviews, a rare near-unanimous rave for an original studio comedy in a summer otherwise dominated by soft remakes and sequels.",
+    source: "rottentomatoes"
+  },
+  {
+    tag: "news", tagLabel: "Streaming",
+    date: "July 13, 2026",
+    title: "MLB Home Run Derby Streams Live on Netflix, Followed by a Hot Ones Special",
+    body: "Netflix streams the MLB Home Run Derby live Monday, July 13 at 7pm ET, immediately followed by a special Hot Ones: Extra Heat episode — the latest example of Netflix's push into live sports and variety programming alongside its scripted slate.",
     source: "tvline"
   },
   {
     tag: "news", tagLabel: "Looking Ahead",
-    date: "July 6, 2026",
-    title: "Next Week on the Calendar: All American's Final Season, DWTS Spinoff, and Rabbit Hole",
-    body: "The CW's All American begins its final season Monday, July 13 with a two-hour premiere (13 episodes total). The same night, ABC launches Dancing With the Stars: The Next Pro, a competition series in which 12 up-and-coming dancers vie for a pro spot on DWTS Season 35, hosted by Robert Irwin. Disney+/Hulu's teen creator variety show Rabbit Hole and Prime Video's true-crime docuseries Murder 101 also drop July 13.",
+    date: "July 12, 2026",
+    title: "This Week on the Calendar: All American's Final Season, DWTS Spinoff, and Rabbit Hole",
+    body: "The CW's All American begins its final season Monday, July 13 with a two-hour premiere (13 episodes total). The same night, ABC launches Dancing With the Stars: The Next Pro, a competition series in which 12 up-and-coming dancers vie for a pro spot on DWTS Season 35, hosted by Robert Irwin. Disney+/Hulu's teen creator variety show Rabbit Hole and Prime Video's true-crime docuseries Murder 101 also drop July 13, and Apple TV+'s Anya Taylor-Joy heist drama Lucky and Prime Video's Ride or Die (Octavia Spencer, Hannah Waddingham) both premiere July 15.",
     source: "tvline"
   },
+];
+
+const TRENDING = [
+  { service: "netflix", label: "Netflix", snapshot: "Jul 10, 2026", top10: ["Old Henry", "White Chicks", "The Boss Baby", "Enola Holmes 3", "Gone Girl", "Spider-Man: Homecoming", "Charlie and the Chocolate Factory", "Voicemails for Isabelle", "Little Brother", "Minions: The Rise of Gru"] },
+  { service: "prime", label: "Prime Video", snapshot: "Jul 2, 2026", top10: ["The Sheep Detectives", "Superman", "Tom Clancy's Jack Ryan: Ghost War", "Aquaman and the Lost Kingdom", "Despicable Me 4", "Ruthless", "Your Fault: London", "Battleship", "Eli Manning Presents: The Undercovers", "A Working Man"] },
+  { service: "disney", label: "Disney+", snapshot: "Jun 21, 2026", top10: ["Toy Story 5 | A Special Look", "Toy Story 4", "Toy Story", "Toy Story 2", "Toy Story 3", "Hoppers", "Extreme Makeover: Homer Edition", "Hoppers Nature Ambiance", "Spider-Man: No Way Home"] },
+  { service: "hbo", label: "Max", snapshot: "Jul 11, 2026", top10: ["Lee Cronin's The Mummy", "Undertone", "How to Make a Killing", "Deadpool 2", "The Equalizer", "They Will Kill You", "Deadpool 2", "Super Troopers 2", "Legally Blonde", "The Equalizer 2"] },
+  { service: "apple", label: "Apple TV+", snapshot: "Jul 10, 2026", top10: ["F1", "Outcome", "The Gorge", "Greyhound", "Echo Valley", "Fountain of Youth", "Wolfs", "The Family Plan", "The Family Plan 2", "Eternity"] },
+  { service: "paramount", label: "Paramount+", snapshot: "Jun 17, 2026", top10: ["Scream 7", "Homefront", "Top Gun: Maverick", "An Unfinished Life", "Primate", "Roofman", "21 Jump Street", "Scary Movie", "The SpongeBob SquarePants Movie", "Without a Paddle"] },
+  { service: "peacock", label: "Peacock", snapshot: "Jul 5, 2026", top10: ["Jaws", "Strung", "The Patriot", "Jaws 2", "Fast Five", "Men in Black", "Shrek 2", "Furious 7", "Shrek Forever After", "Cloudy with a Chance of Meatballs"] },
+  { service: "hulu", label: "Hulu", snapshot: "Jul 7, 2026", top10: ["Ready or Not 2: Here I Come", "Independence Day", "Good Luck, Have Fun, Don't Die", "The Avengers", "Ready or Not", "Send Help", "Twilight", "Americana", "Independence Day: Resurgence", "National Treasure"] },
 ];
 
 // ==================== UTILS ====================
@@ -890,6 +922,17 @@ function renderNews() {
     </div>`).join('');
 }
 
+function renderTrending() {
+  const g = document.getElementById('trending-grid');
+  g.innerHTML = TRENDING.map(t => `
+    <div class="premiere-card">
+      <div class="meta" style="margin-bottom:10px;">${badge(t.service, t.label)}<span style="font-size:0.68rem;color:var(--muted)">Snapshot: ${t.snapshot}</span></div>
+      <ol style="padding-left:18px;font-size:0.8rem;line-height:1.9;color:var(--text)">
+        ${t.top10.map(title => `<li>${title}</li>`).join('')}
+      </ol>
+    </div>`).join('');
+}
+
 // ==================== TABS ====================
 function showTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -987,6 +1030,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderMovies();
   renderMoviePremieres();
   renderNews();
+  renderTrending();
   updateStats();
 });
 </script>
