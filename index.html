@@ -42,7 +42,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
-  
+
   /* Header */
   .header { background: linear-gradient(135deg, #0f1117 0%, #1a0a2e 100%); padding: 20px 24px; border-bottom: 2px solid var(--accent); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
   .header h1 { font-size: 1.6rem; font-weight: 800; }
@@ -292,6 +292,10 @@
         <tr><td><div class="show-name">Pride and Prejudice</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">New Series</td></tr>
         <tr><td><div class="show-name">Untitled Larry David Project</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">TBD</td></tr>
         <tr><td><div class="show-name">War</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">TBD</td></tr>
+        <tr><td><div class="show-name">Below Deck S13</div></td><td><span class="badge badge-bravo">Bravo</span></td><td style="color:var(--muted);font-size:0.78rem">Filmed in Thailand — Date TBD (Summer/Fall 2026)</td></tr>
+        <tr><td><div class="show-name">Severance S3</div></td><td><span class="badge badge-apple">Apple TV+</span></td><td style="color:var(--muted);font-size:0.78rem">Filming Apr–Dec 2026 — likely Summer 2027</td></tr>
+        <tr><td><div class="show-name">Black Mirror S8</div></td><td><span class="badge badge-netflix">Netflix</span></td><td style="color:var(--muted);font-size:0.78rem">Confirmed, no date — estimated late 2027</td></tr>
+        <tr><td><div class="show-name">The Last of Us S3</div></td><td><span class="badge badge-hbo">Max</span></td><td style="color:var(--muted);font-size:0.78rem">Confirmed for 2027, no date yet</td></tr>
       </tbody>
     </table>
   </div>
@@ -409,6 +413,19 @@ const TV_SHOWS = [
   { title: "Little House on the Prairie", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-09", season: 1, ep: "All Eps Out", rt: null, desc: "New 8-episode reimagining of the classic frontier family drama — full season dropped July 9.", current: true },
   { title: "The Five-Star Weekend", service: "peacock", serviceLabel: "Peacock", premiere: "2026-07-09", season: 1, ep: "S1E2", rt: null, desc: "Jennifer Garner-led limited series — a celebrity chef invites three friends from different life stages for a weekend in Nantucket after a loss. D'Arcy Carden, Gemma Chan, Regina Hall, Chloë Sevigny and Timothy Olyphant co-star. 2-episode premiere dropped July 9.", current: true },
   { title: "Big Brother", service: "other", serviceLabel: "CBS", premiere: "2026-07-09", season: 28, ep: "Ongoing", rt: null, desc: "Season 28 kicked off July 9 — summer's biggest reality institution, airing multiple nights weekly.", current: true },
+  { title: "Below Deck Mediterranean", service: "bravo", serviceLabel: "Bravo", premiere: "2026-06-01", season: 11, ep: "Ongoing", rt: null, desc: "Season 11 — filmed in Dubrovnik, Croatia. Mondays on Bravo, next-day on Peacock. Anchor Watchlist show (Below Deck franchise).", current: true },
+  { title: "Below Deck Down Under", service: "bravo", serviceLabel: "Bravo", premiere: "2026-02-02", season: 4, ep: "S4 FINALE", rt: null, desc: "Season 4 wrapped its run this spring. Anchor Watchlist show (Below Deck franchise) — kept per 1-year retention window.", current: true },
+  { title: "Daredevil: Born Again", service: "disney", serviceLabel: "Disney+", premiere: "2026-03-24", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 wrapped May 5. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "The Punisher: One Last Kill", service: "disney", serviceLabel: "Disney+", premiere: "2026-05-12", season: 1, ep: "Special — Complete", rt: null, desc: "Marvel Television Special Presentation continuing Frank Castle's story after Daredevil: Born Again S2. Anchor Watchlist show.", current: true },
+  { title: "The Pitt", service: "hbo", serviceLabel: "HBO Max", premiere: "2026-01-08", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 ran weekly Jan 8 – Apr 16. Emmy-nominations leader (25 noms). Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Industry", service: "hbo", serviceLabel: "HBO", premiere: "2026-01-11", season: 4, ep: "S4 FINALE", rt: null, desc: "Season 4 ran weekly starting Jan 11 (8 episodes). Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Landman", service: "paramount", serviceLabel: "Paramount+", premiere: "2025-11-16", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 premiered Nov 16, 2025. Companion series to Dutton Ranch. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Dark Winds", service: "amcplus", serviceLabel: "AMC", premiere: "2026-02-15", season: 4, ep: "S4 FINALE", rt: null, desc: "Season 4 ran weekly Feb 15 onward (8 episodes). Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Your Friends & Neighbors", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-04-03", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 premiered April 3. Jon Hamm. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "For All Mankind", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-03-27", season: 5, ep: "S5 FINALE", rt: null, desc: "Season 5 premiered March 27. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "The Night Agent", service: "netflix", serviceLabel: "Netflix", premiere: "2026-02-19", season: 3, ep: "All Eps Out", rt: null, desc: "Season 3 dropped Feb 19. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "The Four Seasons", service: "netflix", serviceLabel: "Netflix", premiere: "2026-05-28", season: 2, ep: "All Eps Out", rt: null, desc: "Season 2 dropped May 28 — 8 episodes, Tina Fey. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Paradise", service: "other", serviceLabel: "Hulu", premiere: "2026-02-23", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 premiered Feb 23 with a 3-episode launch, then weekly. Anchor Watchlist show — kept per 1-year retention window.", current: true },
   { title: "House of the Dragon", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-21", season: 3, ep: "S3E4", rt: 82, desc: "Season 3! Targaryen civil war continues — E4 aired July 12. Sunday nights.", current: true },
   { title: "Silo", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-07-03", season: 3, ep: "S3E2", rt: null, desc: "Season 3! New mayor Juliette can't remember anything from her time outside — or her past. New episode dropped July 10. Fridays.", current: true },
   { title: "Survival of the Thickest", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-02", season: 3, ep: "FINAL SEASON — All Eps Out", rt: null, desc: "Final season, 8-episode binge dropped July 2. Mavis and Luca embark on starting a family.", current: true },
@@ -505,9 +522,15 @@ const FALL_NEW_SHOWS = [
 const FALL_RETURNING = [
   // ABC
   { title: "Dancing with the Stars", network: "abc", net: "ABC", slot: "Mon 8pm", notes: "Returns Fall" },
+  { title: "9-1-1", network: "abc", net: "ABC", slot: "Thu 8pm", notes: "Returns Fall" },
+  { title: "9-1-1: Nashville", network: "abc", net: "ABC", slot: "Thu 9pm", notes: "Returns Fall — spinoff" },
+  { title: "Grey's Anatomy", network: "abc", net: "ABC", slot: "Thu 10pm", notes: "Returns Fall — S23" },
+  { title: "High Potential", network: "abc", net: "ABC", slot: "Tue 10pm", notes: "Returns Fall — S2" },
   { title: "9-1-1", network: "abc", net: "ABC", slot: "Wed 8pm", notes: "Returns Fall" },
   { title: "Abbott Elementary", network: "abc", net: "ABC", slot: "Wed 9pm", notes: "Returns Fall" },
   { title: "Doctor Odyssey", network: "abc", net: "ABC", slot: "Thu 9pm", notes: "Returns Fall" },
+  { title: "The Rookie", network: "abc", net: "ABC", slot: "Tue 10pm", notes: "Midseason — returns ~Jan 2027" },
+  { title: "Will Trent", network: "abc", net: "ABC", slot: "Tue 8pm", notes: "Midseason — returns ~Jan 2027 — S5" },
   // CBS
   { title: "NCIS", network: "cbs", net: "CBS", slot: "Mon 9pm", notes: "Returns Fall" },
   { title: "FBI", network: "cbs", net: "CBS", slot: "Tue 8pm", notes: "Returns Fall" },
