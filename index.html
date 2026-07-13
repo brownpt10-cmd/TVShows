@@ -168,6 +168,69 @@
     .controls input { width: 140px; }
     th, td { padding: 7px 8px; }
   }
+
+  /* ============ MOBILE CARD LAYOUT FOR DATA TABLES ============
+     Below 700px, tables stop scrolling horizontally and each row becomes
+     a stacked card: Title -> full-width description -> meta badges ->
+     full-width Status select -> Season/Episode selects side by side. */
+  @media (max-width: 700px) {
+    .tbl-wrap { overflow-x: visible; border: none; margin-left: 0; margin-right: 0; }
+    #tv-table, #movies-table, #tbd-table,
+    #fall-new-shows, #fall-returning { width: 100%; }
+    #tv-table, #movies-table, #tbd-table { display: block; }
+    #tv-table thead, #movies-table thead, #tbd-table thead { display: none; }
+    #tv-table tbody, #movies-table tbody, #tbd-table tbody { display: block; width: 100%; }
+    #tv-table tr, #movies-table tr, #tbd-table tr,
+    #fall-new-shows tr, #fall-returning tr {
+      display: flex; flex-wrap: wrap; align-items: flex-start;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px; margin-bottom: 12px; gap: 8px 10px; width: 100%;
+    }
+    #tv-table td, #movies-table td, #tbd-table td,
+    #fall-new-shows td, #fall-returning td {
+      border-top: none; padding: 0; width: auto; flex: 0 0 auto;
+    }
+
+    /* Title + description: always first, full width */
+    #tv-table td:nth-child(1), #movies-table td:nth-child(1), #tbd-table td:nth-child(1),
+    #fall-new-shows td:nth-child(1), #fall-returning td:nth-child(1) {
+      width: 100%; order: 1;
+    }
+    .show-desc { max-width: none; }
+
+    /* Meta badges (service/date/rt/network/slot/etc): inline row under the title */
+    #tv-table td:nth-child(2), #tv-table td:nth-child(3), #tv-table td:nth-child(4),
+    #movies-table td:nth-child(2), #movies-table td:nth-child(3), #movies-table td:nth-child(4),
+    #tbd-table td:nth-child(2), #tbd-table td:nth-child(3),
+    #fall-new-shows td:nth-child(2), #fall-new-shows td:nth-child(3),
+    #fall-new-shows td:nth-child(4), #fall-new-shows td:nth-child(5),
+    #fall-returning td:nth-child(2), #fall-returning td:nth-child(3),
+    #fall-returning td:nth-child(4) {
+      order: 2; font-size: 0.75rem;
+    }
+
+    /* Status select: full width, own row */
+    #tv-table td:nth-child(5), #movies-table td:nth-child(5),
+    #fall-new-shows td:nth-child(6), #fall-returning td:nth-child(5) {
+      width: 100%; order: 3; margin-top: 4px;
+    }
+    #tv-table td:nth-child(5) .status-sel, #movies-table td:nth-child(5) .status-sel,
+    #fall-new-shows td:nth-child(6) .status-sel, #fall-returning td:nth-child(5) .status-sel {
+      width: 100%;
+    }
+
+    /* Season / Episode selects: side by side under Status */
+    #tv-table td:nth-child(6), #tv-table td:nth-child(7),
+    #fall-new-shows td:nth-child(7), #fall-new-shows td:nth-child(8),
+    #fall-returning td:nth-child(6), #fall-returning td:nth-child(7) {
+      order: 4; flex: 1 1 calc(50% - 5px);
+    }
+    #tv-table td:nth-child(6) .ep-sel, #tv-table td:nth-child(7) .ep-sel,
+    #fall-new-shows td:nth-child(7) .ep-sel, #fall-new-shows td:nth-child(8) .ep-sel,
+    #fall-returning td:nth-child(6) .ep-sel, #fall-returning td:nth-child(7) .ep-sel {
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
