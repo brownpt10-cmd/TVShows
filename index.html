@@ -256,9 +256,9 @@
 
 <!-- Tabs -->
 <div class="tabs">
-  <div class="tab active" onclick="showTab('tv')">📺 TV Shows</div>
+  <div class="tab active" onclick="showTab('tv')">📺 TV Shows/Original Movies</div>
   <div class="tab" onclick="showTab('tv-premieres')">🌟 TV Premieres</div>
-  <div class="tab" onclick="showTab('fall')">🍂 Fall 2026 Preview</div>
+  <div class="tab" onclick="showTab('fall')">🍂 TV Show Premieres</div>
   <div class="tab" onclick="showTab('movies')">🎬 Movies in Theaters</div>
   <div class="tab" onclick="showTab('movie-premieres')">🎥 Coming to Theaters</div>
   <div class="tab" onclick="showTab('news')">📰 This Week's News</div>
@@ -302,7 +302,7 @@
   </div>
 
   <div style="padding:16px 20px 0">
-    <div class="section-title">🔴 Currently Airing — July 10, 2026</div>
+    <div class="section-title">🔴 Currently Airing TV Shows &amp; Original Movies — Week of July 14, 2026</div>
   </div>
   <div class="tbl-wrap" style="margin:0 20px 24px">
     <table id="tv-table">
@@ -366,8 +366,12 @@
 
 <!-- ============ FALL TV ============ -->
 <div id="tab-fall" class="panel">
+  <div class="controls">
+    <input type="text" id="fall-search" placeholder="🔍 Search shows..." oninput="filterFall()">
+    <button class="btn-sort" onclick="resetFilters('fall')">Reset</button>
+  </div>
   <div style="padding:16px 20px 0">
-    <div class="section-title">🍂 New Shows — Fall 2026 / 2026-27 Season</div>
+    <div class="section-title">🍂 New Shows — Streaming &amp; Broadcast</div>
   </div>
   <div class="tbl-wrap" style="margin:0 20px 24px">
     <table>
@@ -376,7 +380,7 @@
     </table>
   </div>
   <div style="padding:0 20px 0">
-    <div class="section-title">📺 Returning Shows — Fall 2026 Primetime Grid</div>
+    <div class="section-title">📺 Returning Shows — Streaming &amp; Broadcast</div>
   </div>
   <div class="tbl-wrap" style="margin:0 20px 24px">
     <table>
@@ -527,6 +531,17 @@ const TV_SHOWS = [
   { title: "Life, Larry & the Pursuit of Unhappiness", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-26", season: 1, ep: "S1E3", rt: null, desc: "Larry David sketch comedy from Obama Productions, backed by Barack and Michelle Obama. New episode dropped July 10. HBO Fridays.", current: true },
 ];
 
+// Original streaming movies — merged into the TV Shows/Original Movies tab.
+// Retention: keep for 5 months from premiere date, then remove ("drip" them off the list).
+const ORIGINAL_MOVIES = [
+  { title: "Lucky", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-07-15", rt: null, desc: "Anya Taylor-Joy plays a con artist on the run after a heist goes sideways. Annette Bening, Timothy Olyphant co-star. Original movie — retained here for 5 months from premiere." },
+  { title: "Heartstopper Forever", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-17", rt: null, desc: "Feature-length film concluding the beloved series — Nick and Charlie face a long-distance relationship as Nick heads to university. Original movie — retained here for 5 months from premiere." },
+  { title: "Camp Rock 3", service: "disney", serviceLabel: "Disney+", premiere: "2026-08-13", rt: null, desc: "Connect 3 loses their opening act for a major reunion tour and returns to Camp Rock. Original movie — retained here for 5 months from premiere." },
+  { title: "Enola Holmes 3", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-31", rt: null, desc: "Millie Bobby Brown returns as Sherlock Holmes' sister — her impending nuptials are interrupted when her brother goes missing. Exact date TBD as of this writing. Original movie — retained here for 5 months from premiere." },
+  { title: "The Devil's Mouth", service: "prime", serviceLabel: "Prime Video", premiere: "2026 (TBD)", rt: null, desc: "A group of friends, including Kathryn Newton and Lana Condor, take a trip to Thailand and find something deadly in a cave. Exact date TBD. Original movie — retained here for 5 months from premiere." },
+  { title: "The Dink", service: "apple", serviceLabel: "Apple TV+", premiere: "2026 (TBD)", rt: null, desc: "Jake Johnson plays a former tennis pro past his prime who's drawn into competitive pickleball after injuring his wrist. Exact date TBD. Original movie — retained here for 5 months from premiere." },
+];
+
 const PREMIERES_JUNE = [
   { date: "July 10", title: "Star City — Series Finale", service: "apple", serviceLabel: "Apple TV+", desc: "Season 1 finale streams today.", rt: null },
   { date: "July 10", title: "The Listeners — Limited Series Finale", service: "starz", serviceLabel: "Starz", desc: "Rebecca Hall's hum-obsessed drama wraps its run today on Starz.", rt: 88 },
@@ -580,6 +595,27 @@ const FALL_NEW_SHOWS = [
   { title: "Sunset P.I.", network: "nbc", net: "NBC", slot: "Mon 8:30pm", premiere: "Feb 2027", cast: "Jake Johnson, Jane Levy, Keith David", desc: "L.A. private eye comedy in the tradition of Philip Marlowe." },
   { title: "Wordle", network: "nbc", net: "NBC", slot: "TBD", premiere: "Midseason TBD", cast: "Savannah Guthrie (host)", desc: "Game show based on the New York Times word puzzle phenomenon." },
   { title: "Marriage Market", network: "fox", net: "Fox", slot: "TBD", premiere: "Midseason TBD", cast: "Whitney Cummings (host)", desc: "Real singles let family members choose their partners." },
+  { title: "The Hawk", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Jul 16, 2026", cast: "Will Ferrell", desc: "A washed-up golfer convinced he's one stroke from the greatest comeback ever. 10-episode binge." },
+  { title: "The East Palace", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Jul 17, 2026", cast: "TBD", desc: "New drama series." },
+  { title: "The Map of Longing", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Jul 17, 2026", cast: "TBD", desc: "New drama limited series." },
+  { title: "Spooky in Love", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Jul 18, 2026", cast: "TBD", desc: "New comedy series." },
+  { title: "Stuart Fails to Save the Universe", network: "hbo", net: "Max", slot: "Streaming", premiere: "Jul 23, 2026", cast: "Kevin Sussman", desc: "A comic book store owner enters the multiverse." },
+  { title: "Wrath", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Jul 29, 2026", cast: "TBD", desc: "New drama series." },
+  { title: "House of Stassi", network: "hulu", net: "Hulu", slot: "Streaming", premiere: "Jul 30, 2026", cast: "TBD", desc: "New unscripted series." },
+  { title: "Let's Marry Harry", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Aug 5, 2026", cast: "TBD", desc: "New dating series." },
+  { title: "Sterling Point", network: "prime", net: "Prime Video", slot: "Streaming", premiere: "Aug 5, 2026", cast: "TBD", desc: "Coming-of-age drama centered on 17-year-old Annie Jacobson." },
+  { title: "Alley Cats", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Aug 7, 2026", cast: "TBD", desc: "Ricky Gervais adult animated comedy — feral British cats causing havoc and musing on life's meaning." },
+  { title: "Lanterns", network: "hbo", net: "Max", slot: "Streaming", premiere: "Aug 16, 2026", cast: "TBD", desc: "New HBO Max original series." },
+  { title: "Mayday", network: "apple", net: "Apple TV+", slot: "Streaming", premiere: "Sep 4, 2026", cast: "TBD", desc: "New Apple TV+ series." },
+  { title: "Last Seen", network: "apple", net: "Apple TV+", slot: "Streaming", premiere: "Sep 9, 2026", cast: "TBD", desc: "New Apple TV+ series." },
+  { title: "A Very Haunted Renovation", network: "other", net: "TBD", slot: "Streaming", premiere: "Sep 15, 2026", cast: "TBD", desc: "Service not yet confirmed as of this writing." },
+  { title: "Agatha Christie's Tommy & Tuppence", network: "other", net: "TBD", slot: "Streaming", premiere: "Sep 15, 2026", cast: "TBD", desc: "Service not yet confirmed as of this writing." },
+  { title: "The Doll", network: "other", net: "TBD", slot: "Streaming", premiere: "Sep 16, 2026", cast: "TBD", desc: "Service not yet confirmed as of this writing." },
+  { title: "Neagley", network: "prime", net: "Prime Video", slot: "Streaming", premiere: "Sep 16, 2026", cast: "TBD", desc: "Reacher spinoff following Frances Neagley." },
+  { title: "Best of the Best", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Sep 18, 2026", cast: "Maitreyi Ramakrishnan, Hasan Minhaj", desc: "New comedy series." },
+  { title: "Brothers", network: "apple", net: "Apple TV+", slot: "Streaming", premiere: "Sep 23, 2026", cast: "TBD", desc: "New Apple TV+ series." },
+  { title: "A Different World", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Sep 24, 2026", cast: "TBD", desc: "New Netflix series." },
+  { title: "LEGO ONE PIECE", network: "netflix", net: "Netflix", slot: "Streaming", premiere: "Sep 29, 2026", cast: "TBD", desc: "New animated series." },
 ];
 
 const FALL_RETURNING = [
@@ -618,6 +654,22 @@ const FALL_RETURNING = [
   { title: "Law & Order: Organized Crime", network: "nbc", net: "NBC", slot: "Thu 10pm", notes: "Returns Fall" },
   { title: "America's Got Talent", network: "nbc", net: "NBC", slot: "Tue 8pm", notes: "Summer/Fall — S21" },
   { title: "American Ninja Warrior", network: "nbc", net: "NBC", slot: "Mon 9pm", notes: "Returns Summer" },
+  { title: "The Ultimatum: Marry or Move On", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 4 — Jul 15, 2026" },
+  { title: "King of the Hill", network: "hulu", net: "Hulu", slot: "Streaming", notes: "Season 15 — Jul 20, 2026" },
+  { title: "Batman: Caped Crusader", network: "prime", net: "Prime Video", slot: "Streaming", notes: "Season 2 — Jul 31, 2026" },
+  { title: "Ted Lasso", network: "apple", net: "Apple TV+", slot: "Streaming", notes: "Season 4 — Aug 5, 2026" },
+  { title: "One Hundred Years of Solitude", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 2, final season — Aug 5, 2026" },
+  { title: "1670", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 3 — Aug 5, 2026" },
+  { title: "Reacher", network: "prime", net: "Prime Video", slot: "Streaming", notes: "Season 4 — Aug 12, 2026" },
+  { title: "Tires", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 3 — Aug 13, 2026" },
+  { title: "Outer Banks", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 5, final season — Aug 20, 2026" },
+  { title: "Dark Matter", network: "apple", net: "Apple TV+", slot: "Streaming", notes: "Season 2 — Aug 28, 2026" },
+  { title: "The Gentlemen", network: "netflix", net: "Netflix", slot: "Streaming", notes: "Season 2 — Sep 3, 2026" },
+  { title: "The Paper", network: "peacock", net: "Peacock", slot: "Streaming", notes: "Season 2 — Sep 9, 2026" },
+  { title: "Zombies: The Re-Animated Series", network: "disney", net: "Disney+", slot: "Streaming", notes: "Season 2 — Sep 13, 2026" },
+  { title: "Slow Horses", network: "apple", net: "Apple TV+", slot: "Streaming", notes: "Season 6 — Sep 16, 2026" },
+  { title: "Outlander: Blood of My Blood", network: "starz", net: "Starz", slot: "Streaming", notes: "Season 2 — Sep 18, 2026" },
+  { title: "Vampirina: Teenage Vampire", network: "disney", net: "Disney+", slot: "Streaming", notes: "Season 2 — Sep 30, 2026" },
 ];
 
 const MOVIES_IN_THEATERS = [
@@ -895,24 +947,36 @@ function updateStats() {
 
 function netBadge(n) {
   const m = { abc:'badge-abc', cbs:'badge-cbs', nbc:'badge-nbc', fox:'badge-fox' };
-  return `<span class="badge ${m[n]||'badge-other'}">${n.toUpperCase()}</span>`;
+  if (m[n]) return `<span class="badge ${m[n]}">${n.toUpperCase()}</span>`;
+  const labels = { netflix:'Netflix', hbo:'Max', hulu:'Hulu', prime:'Prime Video', apple:'Apple TV+', disney:'Disney+', paramount:'Paramount+', peacock:'Peacock', starz:'Starz', amcplus:'AMC+', fx:'FX', bravo:'Bravo', other:'TBD' };
+  const cls = BADGE_MAP[n] || 'badge-other';
+  return `<span class="badge ${cls}">${labels[n] || n.toUpperCase()}</span>`;
 }
 
 // ==================== RENDER ====================
 
 function renderTV() {
   const tbody = document.querySelector('#tv-table tbody');
-  tbody.innerHTML = TV_SHOWS.map((s, i) => {
-    const id = `tv-${slugify(s.title)}`;
-    const ep = s.ep ? `<div class="latest-ep">Latest: ${s.ep}</div>` : '';
+  const combined = [
+    ...TV_SHOWS.map(s => ({ ...s, _kind: 'tv' })),
+    ...ORIGINAL_MOVIES.map(m => ({ ...m, _kind: 'movie' }))
+  ];
+  tbody.innerHTML = combined.map((s) => {
+    const kindType = s._kind === 'movie' ? 'morig' : 'tv';
+    const id = `${kindType}-${slugify(s.title)}`;
+    const ep = s._kind === 'movie'
+      ? '<div class="latest-ep">🎬 Original Movie</div>'
+      : (s.ep ? `<div class="latest-ep">Latest: ${s.ep}</div>` : '');
+    const seasonCell = s._kind === 'movie' ? '<span style="color:var(--muted);font-size:0.75rem">—</span>' : seasonSel(id, kindType, s.title, s.season);
+    const episodeCell = s._kind === 'movie' ? '<span style="color:var(--muted);font-size:0.75rem">—</span>' : episodeSel(id, kindType, s.title);
     return `<tr data-service="${s.service}" data-title="${s.title.toLowerCase()}">
       <td><div class="show-name">${s.title}</div>${ep}<div class="show-desc">${s.desc}</div></td>
       <td>${badge(s.service, s.serviceLabel)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.premiere}</td>
       <td>${rtScore(s.rt)}</td>
-      <td>${statusSel(id, 'tv', s.title)}</td>
-      <td>${seasonSel(id, 'tv', s.title, s.season)}</td>
-      <td>${episodeSel(id, 'tv', s.title)}</td>
+      <td>${statusSel(id, kindType, s.title)}</td>
+      <td>${seasonCell}</td>
+      <td>${episodeCell}</td>
     </tr>`;
   }).join('');
 }
@@ -941,7 +1005,7 @@ function renderFall() {
   const ns = document.getElementById('fall-new-shows');
   ns.innerHTML = FALL_NEW_SHOWS.map((s, i) => {
     const id = `fall-${slugify(s.title)}`;
-    return `<tr>
+    return `<tr data-title="${s.title.toLowerCase()}">
       <td><div class="show-name">${s.title}</div><div class="show-desc">${s.desc}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
@@ -956,7 +1020,7 @@ function renderFall() {
   const ret = document.getElementById('fall-returning');
   ret.innerHTML = FALL_RETURNING.map((s, i) => {
     const id = `ret-${slugify(s.title)}`;
-    return `<tr>
+    return `<tr data-title="${s.title.toLowerCase()}">
       <td><div class="show-name">${s.title}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
@@ -1052,12 +1116,23 @@ function filterMovies() {
   });
 }
 
+function filterFall() {
+  const q = document.getElementById('fall-search').value.toLowerCase();
+  document.querySelectorAll('#fall-new-shows tr, #fall-returning tr').forEach(row => {
+    const title = row.dataset.title || '';
+    row.style.display = !q || title.includes(q) ? '' : 'none';
+  });
+}
+
 function resetFilters(type) {
   if (type === 'tv') {
     document.getElementById('tv-search').value = '';
     document.getElementById('tv-service').value = '';
     document.getElementById('tv-status-filter').value = '';
     filterTV();
+  } else if (type === 'fall') {
+    document.getElementById('fall-search').value = '';
+    filterFall();
   }
 }
 
