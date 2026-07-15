@@ -367,7 +367,36 @@
 <!-- ============ FALL TV ============ -->
 <div id="tab-fall" class="panel">
   <div class="controls">
+    <label>Filter:</label>
     <input type="text" id="fall-search" placeholder="🔍 Search shows..." oninput="filterFall()">
+    <label>Service:</label>
+    <select id="fall-service" onchange="filterFall()">
+      <option value="">All Services</option>
+      <option value="netflix">Netflix</option>
+      <option value="hbo">HBO / Max</option>
+      <option value="hulu">Hulu</option>
+      <option value="prime">Prime Video</option>
+      <option value="apple">Apple TV+</option>
+      <option value="disney">Disney+</option>
+      <option value="paramount">Paramount+</option>
+      <option value="peacock">Peacock</option>
+      <option value="starz">Starz</option>
+      <option value="fox">Fox</option>
+      <option value="abc">ABC</option>
+      <option value="cbs">CBS</option>
+      <option value="nbc">NBC</option>
+      <option value="fx">FX / FXX</option>
+      <option value="amcplus">AMC+</option>
+      <option value="bravo">Bravo</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Status:</label>
+    <select id="fall-status-filter" onchange="filterFall()">
+      <option value="">All</option>
+      <option value="watching">Watching</option>
+      <option value="mylist">My List</option>
+      <option value="completed">Completed</option>
+    </select>
     <button class="btn-sort" onclick="resetFilters('fall')">Reset</button>
   </div>
   <div style="padding:16px 20px 0">
@@ -493,6 +522,9 @@ const TV_SHOWS = [
   { title: "The Night Agent", service: "netflix", serviceLabel: "Netflix", premiere: "2026-02-19", season: 3, ep: "All Eps Out", rt: null, desc: "Season 3 dropped Feb 19. Anchor Watchlist show — kept per 1-year retention window.", current: true },
   { title: "The Four Seasons", service: "netflix", serviceLabel: "Netflix", premiere: "2026-05-28", season: 2, ep: "All Eps Out", rt: null, desc: "Season 2 dropped May 28 — 8 episodes, Tina Fey. Anchor Watchlist show — kept per 1-year retention window.", current: true },
   { title: "Paradise", service: "other", serviceLabel: "Hulu", premiere: "2026-02-23", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 premiered Feb 23 with a 3-episode launch, then weekly. Anchor Watchlist show — kept per 1-year retention window.", current: true },
+  { title: "Shrinking", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-01-28", season: 3, ep: "S3 FINALE", rt: null, desc: "Season 3 ran weekly Jan 28 – Apr 8 (11 episodes), Jason Segel and Harrison Ford. Anchor Watchlist show — was missed in the last update, added now; kept per 1-year retention window.", current: true },
+  { title: "Tell Me Lies", service: "hulu", serviceLabel: "Hulu/Disney+", premiere: "2026-01-13", season: 3, ep: "S3 FINALE", rt: null, desc: "Season 3 ran Jan 13 – Feb 17. Previously missed by weekly research (not on the Anchor Watchlist, no headline coverage that week) — added now; kept per 1-year retention window.", current: true },
+  { title: "The Last Thing He Told Me", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-02-20", season: 2, ep: "S2 FINALE", rt: null, desc: "Season 2 ran Feb 20 – Apr 20, Jennifer Garner. Previously missed by weekly research (not on the Anchor Watchlist, no headline coverage that week) — added now; kept per 1-year retention window.", current: true },
   { title: "House of the Dragon", service: "hbo", serviceLabel: "HBO", premiere: "2026-06-21", season: 3, ep: "S3E4", rt: 82, desc: "Season 3! Targaryen civil war continues — E4 aired July 12. Sunday nights.", current: true },
   { title: "Silo", service: "apple", serviceLabel: "Apple TV+", premiere: "2026-07-03", season: 3, ep: "S3E2", rt: null, desc: "Season 3! New mayor Juliette can't remember anything from her time outside — or her past. New episode dropped July 10. Fridays.", current: true },
   { title: "Survival of the Thickest", service: "netflix", serviceLabel: "Netflix", premiere: "2026-07-02", season: 3, ep: "FINAL SEASON — All Eps Out", rt: null, desc: "Final season, 8-episode binge dropped July 2. Mavis and Luca embark on starting a family.", current: true },
@@ -1005,7 +1037,7 @@ function renderFall() {
   const ns = document.getElementById('fall-new-shows');
   ns.innerHTML = FALL_NEW_SHOWS.map((s, i) => {
     const id = `fall-${slugify(s.title)}`;
-    return `<tr data-title="${s.title.toLowerCase()}">
+    return `<tr data-title="${s.title.toLowerCase()}" data-service="${s.network}">
       <td><div class="show-name">${s.title}</div><div class="show-desc">${s.desc}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
@@ -1020,7 +1052,7 @@ function renderFall() {
   const ret = document.getElementById('fall-returning');
   ret.innerHTML = FALL_RETURNING.map((s, i) => {
     const id = `ret-${slugify(s.title)}`;
-    return `<tr data-title="${s.title.toLowerCase()}">
+    return `<tr data-title="${s.title.toLowerCase()}" data-service="${s.network}">
       <td><div class="show-name">${s.title}</div></td>
       <td>${netBadge(s.network)}</td>
       <td style="white-space:nowrap;font-size:0.78rem">${s.slot}</td>
@@ -1118,9 +1150,17 @@ function filterMovies() {
 
 function filterFall() {
   const q = document.getElementById('fall-search').value.toLowerCase();
+  const svc = document.getElementById('fall-service').value;
+  const st = document.getElementById('fall-status-filter').value;
   document.querySelectorAll('#fall-new-shows tr, #fall-returning tr').forEach(row => {
     const title = row.dataset.title || '';
-    row.style.display = !q || title.includes(q) ? '' : 'none';
+    const service = row.dataset.service || '';
+    const statusEl = row.querySelector('.status-sel');
+    const status = statusEl ? statusEl.value : '';
+    const matchQ = !q || title.includes(q);
+    const matchS = !svc || service === svc;
+    const matchSt = !st || status === st;
+    row.style.display = matchQ && matchS && matchSt ? '' : 'none';
   });
 }
 
@@ -1132,6 +1172,8 @@ function resetFilters(type) {
     filterTV();
   } else if (type === 'fall') {
     document.getElementById('fall-search').value = '';
+    document.getElementById('fall-service').value = '';
+    document.getElementById('fall-status-filter').value = '';
     filterFall();
   }
 }
