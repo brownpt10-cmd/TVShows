@@ -1,293 +1,651 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dark Skies Consulting — Country Top 30 / Top 50 Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Skies Consulting — Country Top 30/50 Tracker</title>
 <style>
-  :root{
-    --bg:#0b0f14; --panel:#121822; --panel2:#161e2b; --border:#232d3d;
-    --text:#e8edf4; --muted:#93a1b5; --accent:#5aa9ff; --accent2:#ffb454;
-    --ok:#38c793;
+  :root {
+    --bg: #0b0d12;
+    --panel: #151821;
+    --panel2: #1b1f2a;
+    --border: #2a2f3d;
+    --text: #e8e9ee;
+    --muted: #9aa0ae;
+    --accent: #e0a832;
+    --accent2: #4fb0e0;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding: 0 0 60px;
   }
-  .toplink{
-    display:block; text-align:center; padding:12px 16px; background:var(--accent2);
-    color:#241400; font-weight:800; font-size:14px; text-decoration:none; letter-spacing:.2px;
+  .banner {
+    display: block;
+    background: linear-gradient(90deg, #b8791f, var(--accent));
+    color: #1a1200;
+    text-align: center;
+    padding: 14px 16px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 15px;
+    letter-spacing: 0.2px;
   }
-  .toplink:hover{filter:brightness(1.06);}
-  header{
-    padding:28px 24px 18px; border-bottom:1px solid var(--border);
-    background:linear-gradient(180deg,#0e1420,#0b0f14);
+  .banner:hover { filter: brightness(1.08); }
+  header {
+    padding: 32px 24px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
   }
-  header h1{margin:0 0 4px; font-size:22px; letter-spacing:.2px;}
-  header .sub{color:var(--muted); font-size:14px;}
-  .wrap{max-width:1100px; margin:0 auto; padding:20px 24px 60px;}
-  .cols{display:grid; grid-template-columns:1fr; gap:24px;}
-  @media (min-width:900px){ .cols{grid-template-columns:1fr 1fr;} }
-  .panel{
-    background:var(--panel); border:1px solid var(--border); border-radius:12px;
-    overflow:hidden;
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
-  .panel-head{
-    padding:14px 18px; border-bottom:1px solid var(--border);
-    display:flex; align-items:center; justify-content:space-between;
-    background:var(--panel2);
+  header h2 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
   }
-  .panel-head h2{margin:0; font-size:15px;}
-  .panel-head .tag{
-    font-size:11px; color:var(--muted); border:1px solid var(--border);
-    border-radius:999px; padding:3px 9px;
+  header .date {
+    color: var(--muted);
+    font-size: 14px;
   }
-  .rows{display:flex; flex-direction:column;}
-  .row{
-    display:grid; grid-template-columns:34px 1fr auto auto; gap:12px;
-    align-items:center; padding:11px 18px; border-bottom:1px solid var(--border);
+  .wrap {
+    max-width: 1300px;
+    margin: 28px auto 0;
+    padding: 0 24px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
   }
-  .row:last-child{border-bottom:none;}
-  .row:hover{background:rgba(255,255,255,.02);}
-  .rank{color:var(--muted); font-weight:600; font-size:13px;}
-  .song{min-width:0;}
-  .song .title{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .song .artist{font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .plays{font-size:11.5px; color:var(--muted); white-space:nowrap;}
-  .listen{
-    display:inline-flex; align-items:center; gap:6px;
-    background:var(--accent); color:#04101f; text-decoration:none;
-    font-size:12px; font-weight:700; padding:7px 11px; border-radius:8px;
-    white-space:nowrap;
+  .panel {
+    flex: 1 1 480px;
+    min-width: 320px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
   }
-  .listen:hover{filter:brightness(1.08);}
-  .placeholder{
-    padding:40px 20px; text-align:center; color:var(--muted); font-size:13.5px; line-height:1.6;
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: var(--panel2);
+    border-bottom: 1px solid var(--border);
   }
-  .placeholder b{color:var(--text);}
-  section.automate{
-    margin-top:28px; background:var(--panel); border:1px solid var(--border);
-    border-radius:12px; padding:20px 22px;
+  .panel-header h3 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 0.3px;
   }
-  section.automate h2{margin:0 0 6px; font-size:16px;}
-  section.automate p{color:var(--muted); font-size:13.5px; line-height:1.6; margin:6px 0;}
-  .steps{margin:14px 0 4px; padding-left:20px; color:var(--text); font-size:13.5px; line-height:1.9;}
-  .steps a{color:var(--accent);}
-  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
-  .btn{
-    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
-    padding:10px 16px; border-radius:9px; font-size:13px; font-weight:700;
+  .panel-header .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
   }
-  .btn.primary{background:var(--accent2); color:#241400;}
-  .btn.secondary{background:transparent; color:var(--text); border:1px solid var(--border);}
-  footer{color:var(--muted); font-size:12px; text-align:center; padding:20px; border-top:1px solid var(--border);}
+  .csv-btn {
+    background: var(--accent2);
+    color: #06131a;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .csv-btn:hover { filter: brightness(1.1); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  tr { border-bottom: 1px solid var(--border); }
+  tr:last-child { border-bottom: none; }
+  td { padding: 10px 14px; vertical-align: middle; }
+  .rank {
+    width: 34px;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 14px;
+  }
+  .song .title { font-size: 14px; font-weight: 600; }
+  .song .artist { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .plays {
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    text-align: right;
+  }
+  .listen { text-align: right; width: 110px; }
+  .listen-btn {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .listen-btn:hover { background: var(--accent); color: #1a1200; }
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 32px;
+  }
+  @media (max-width: 800px) {
+    .wrap { flex-direction: column; }
+  }
 </style>
 </head>
 <body>
-
-<a class="toplink" href="https://www.tunemymusic.com/home" target="_blank" rel="noopener">Automate this into an Amazon Music playlist → TuneMyMusic</a>
-
+<a class="banner" href="https://www.tunemymusic.com/home" target="_blank" rel="noopener">
+  🎧 Automate this into an Amazon Music playlist → TuneMyMusic
+</a>
 <header>
   <h1>Dark Skies Consulting — Music Division</h1>
-  <div class="sub">Country Top 30 / Top 50 Tracker · updated Aug 14–18, 2026</div>
+  <h2>Country Top 30 / Top 50 Tracker</h2>
+  <div class="date">Generated 2026-08-18</div>
 </header>
-
 <div class="wrap">
-  <div class="cols">
-
-    <!-- iHeart Bobby Bones -->
-    <div class="panel">
-      <div class="panel-head">
-        <h2>iHeart — Country Top 30 with Bobby Bones</h2>
-        <span class="tag">Week of Aug 14–16</span>
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>iHeart Bobby Bones — Country Top 30</h3>
+        <div class="sub">August 14 - August 16</div>
       </div>
-      <div class="rows" id="bobby-rows"></div>
+      <a class="csv-btn" href="data:text/csv;charset=utf-8,Rank%2CTitle%2CArtist%0D%0A1%2CI%20Can%27t%20Love%20You%20Anymore%2CElla%20Langley%20%26%20Morgan%20Wallen%0D%0A2%2CDon%27t%20We%2CMorgan%20Wallen%0D%0A3%2CBe%20By%20You%2CLuke%20Combs%0D%0A4%2CChevy%20Silverado%2CBailey%20Zimmerman%0D%0A5%2CDon%27t%20Tell%20On%20Me%2CJason%20Aldean%0D%0A6%2C%22I%20Knew%20It%2C%20I%20Knew%20You%22%2CTaylor%20Swift%0D%0A7%2CWoman%2CKane%20Brown%0D%0A8%2CBoston%2CSTELLA%20LEFTY%0D%0A9%2CCarry%20On%2CKenny%20Chesney%0D%0A10%2CKid%20Myself%2CJohn%20Morgan%0D%0A11%2C%22Ride%2C%20Ride%2C%20Ride%22%2CGeorge%20Birge%20%26%20Luke%20Bryan%0D%0A12%2CCountry%20And%20She%20Knows%20It%2CLuke%20Bryan%0D%0A13%2CHate%20How%20You%20Look%2CJosh%20Ross%0D%0A14%2CBe%20Her%2CElla%20Langley%0D%0A15%2CMcArthur%2C%22HARDY%2C%20Eric%20Church%2C%20Morgan%20Wallen%20%26%20Tim%20McGraw%22%0D%0A16%2CAll%20My%20Exes%2CLauren%20Alaina%20feat.%20Chase%20Matthew%0D%0A17%2C%22Phone%2C%20Keys%2C%20Wallet%22%2CLainey%20Wilson%20feat.%20John%20Mayer%0D%0A18%2CGet%20To%20Drinkin%27%2CZach%20John%20King%0D%0A19%2CSay%20So%2CDan%20%2B%20Shay%0D%0A20%2CThink%20As%20You%20Drunk%2CRiley%20Green%0D%0A21%2CBoots%20Off%2CJon%20Pardi%0D%0A22%2CHands%20Up%2CJelly%20Roll%0D%0A23%2CBeen%20By%20Now%2CMorgan%20Wallen%0D%0A24%2CLet%20Him%20In%20Anyway%2CBlake%20Shelton%0D%0A25%2CPainted%20You%20Pretty%2CHudson%20Westbrook%0D%0A26%2CWater%20At%20A%20Wedding%2CGreylan%20James%0D%0A27%2CSouth%20Of%20Sanity%2CZach%20Top%0D%0A28%2CEasy%20To%20Love%2CDustin%20Lynch%0D%0A29%2CStraight%20For%20The%20Heart%2CAlexandra%20Kay%0D%0A30%2CWorth%20Your%20Wild%2CRussell%20Dickerson%0D%0A" download="bobby_bones_top30_2026-08-18.csv">⬇ Download CSV</a>
     </div>
-
-    <!-- SiriusXM Highway Top 50 Most Played -->
-    <div class="panel">
-      <div class="panel-head">
-        <h2>SiriusXM — The Highway Top 50 Most Played</h2>
-        <span class="tag">last 30 days · via xmplaylist</span>
-      </div>
-      <div class="rows" id="highway-rows"></div>
-    </div>
-
+    <table>
+      <tbody>
+        
+        <tr>
+          <td class="rank">1</td>
+          <td class="song"><div class="title">I Can't Love You Anymore</div><div class="artist">Ella Langley &amp; Morgan Wallen</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/I%20Can%27t%20Love%20You%20Anymore%20Ella%20Langley%20%26%20Morgan%20Wallen" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">2</td>
+          <td class="song"><div class="title">Don't We</div><div class="artist">Morgan Wallen</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Don%27t%20We%20Morgan%20Wallen" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">3</td>
+          <td class="song"><div class="title">Be By You</div><div class="artist">Luke Combs</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Be%20By%20You%20Luke%20Combs" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">4</td>
+          <td class="song"><div class="title">Chevy Silverado</div><div class="artist">Bailey Zimmerman</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Chevy%20Silverado%20Bailey%20Zimmerman" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">5</td>
+          <td class="song"><div class="title">Don't Tell On Me</div><div class="artist">Jason Aldean</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Don%27t%20Tell%20On%20Me%20Jason%20Aldean" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">6</td>
+          <td class="song"><div class="title">I Knew It, I Knew You</div><div class="artist">Taylor Swift</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/I%20Knew%20It%2C%20I%20Knew%20You%20Taylor%20Swift" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">7</td>
+          <td class="song"><div class="title">Woman</div><div class="artist">Kane Brown</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Woman%20Kane%20Brown" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">8</td>
+          <td class="song"><div class="title">Boston</div><div class="artist">STELLA LEFTY</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Boston%20STELLA%20LEFTY" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">9</td>
+          <td class="song"><div class="title">Carry On</div><div class="artist">Kenny Chesney</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Carry%20On%20Kenny%20Chesney" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">10</td>
+          <td class="song"><div class="title">Kid Myself</div><div class="artist">John Morgan</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Kid%20Myself%20John%20Morgan" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">11</td>
+          <td class="song"><div class="title">Ride, Ride, Ride</div><div class="artist">George Birge &amp; Luke Bryan</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Ride%2C%20Ride%2C%20Ride%20George%20Birge%20%26%20Luke%20Bryan" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">12</td>
+          <td class="song"><div class="title">Country And She Knows It</div><div class="artist">Luke Bryan</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Country%20And%20She%20Knows%20It%20Luke%20Bryan" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">13</td>
+          <td class="song"><div class="title">Hate How You Look</div><div class="artist">Josh Ross</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Hate%20How%20You%20Look%20Josh%20Ross" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">14</td>
+          <td class="song"><div class="title">Be Her</div><div class="artist">Ella Langley</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Be%20Her%20Ella%20Langley" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">15</td>
+          <td class="song"><div class="title">McArthur</div><div class="artist">HARDY, Eric Church, Morgan Wallen &amp; Tim McGraw</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/McArthur%20HARDY%2C%20Eric%20Church%2C%20Morgan%20Wallen%20%26%20Tim%20McGraw" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">16</td>
+          <td class="song"><div class="title">All My Exes</div><div class="artist">Lauren Alaina feat. Chase Matthew</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/All%20My%20Exes%20Lauren%20Alaina%20feat.%20Chase%20Matthew" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">17</td>
+          <td class="song"><div class="title">Phone, Keys, Wallet</div><div class="artist">Lainey Wilson feat. John Mayer</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Phone%2C%20Keys%2C%20Wallet%20Lainey%20Wilson%20feat.%20John%20Mayer" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">18</td>
+          <td class="song"><div class="title">Get To Drinkin'</div><div class="artist">Zach John King</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Get%20To%20Drinkin%27%20Zach%20John%20King" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">19</td>
+          <td class="song"><div class="title">Say So</div><div class="artist">Dan + Shay</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Say%20So%20Dan%20%2B%20Shay" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">20</td>
+          <td class="song"><div class="title">Think As You Drunk</div><div class="artist">Riley Green</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Think%20As%20You%20Drunk%20Riley%20Green" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">21</td>
+          <td class="song"><div class="title">Boots Off</div><div class="artist">Jon Pardi</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Boots%20Off%20Jon%20Pardi" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">22</td>
+          <td class="song"><div class="title">Hands Up</div><div class="artist">Jelly Roll</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Hands%20Up%20Jelly%20Roll" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">23</td>
+          <td class="song"><div class="title">Been By Now</div><div class="artist">Morgan Wallen</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Been%20By%20Now%20Morgan%20Wallen" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">24</td>
+          <td class="song"><div class="title">Let Him In Anyway</div><div class="artist">Blake Shelton</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Let%20Him%20In%20Anyway%20Blake%20Shelton" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">25</td>
+          <td class="song"><div class="title">Painted You Pretty</div><div class="artist">Hudson Westbrook</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Painted%20You%20Pretty%20Hudson%20Westbrook" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">26</td>
+          <td class="song"><div class="title">Water At A Wedding</div><div class="artist">Greylan James</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Water%20At%20A%20Wedding%20Greylan%20James" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">27</td>
+          <td class="song"><div class="title">South Of Sanity</div><div class="artist">Zach Top</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/South%20Of%20Sanity%20Zach%20Top" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">28</td>
+          <td class="song"><div class="title">Easy To Love</div><div class="artist">Dustin Lynch</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Easy%20To%20Love%20Dustin%20Lynch" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">29</td>
+          <td class="song"><div class="title">Straight For The Heart</div><div class="artist">Alexandra Kay</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Straight%20For%20The%20Heart%20Alexandra%20Kay" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">30</td>
+          <td class="song"><div class="title">Worth Your Wild</div><div class="artist">Russell Dickerson</div></td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Worth%20Your%20Wild%20Russell%20Dickerson" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-
-  <section class="automate">
-    <h2>Turning this into a real Amazon Music playlist</h2>
-    <p>
-      Amazon Music doesn't offer a way for outside apps (or a page like this) to build a playlist for you automatically —
-      there's no consumer-facing API, and Amazon's own <b>"Import Your Playlists"</b> feature only pulls a playlist
-      <i>in</i> from Spotify, Apple Music, YouTube Music, Tidal, SoundCloud, or Deezer. It doesn't accept a plain
-      song list or CSV directly.
-    </p>
-    <p>The closest thing to one-click automation:</p>
-    <ol class="steps">
-      <li>Download the CSV(s) below.</li>
-      <li>Go to <a href="https://www.tunemymusic.com/home" target="_blank" rel="noopener">TuneMyMusic</a> and choose the CSV → Amazon Music transfer (free for this size list).</li>
-      <li>Upload the CSV, sign in and authorize Amazon Music when prompted, and it matches each track by title/artist and builds the playlist for you — you'll get a report of anything it couldn't match.</li>
-    </ol>
-    <p>
-      For one-off listening (not building a saved playlist), every "Listen" button in the tables above
-      opens a live search on Amazon Music for that exact song — click it, then hit play or add it to a
-      playlist yourself from there.
-    </p>
-    <div class="btnrow">
-      <a class="btn primary" id="csv-download-bobby" download="bobby_bones_top30_2026-08-14.csv">⬇ Download Bobby Bones CSV (30 songs)</a>
-      <a class="btn primary" id="csv-download-highway" download="highway_top50_2026-08-18.csv">⬇ Download Highway CSV (50 songs)</a>
-      <a class="btn secondary" href="https://www.tunemymusic.com/home" target="_blank" rel="noopener">Open TuneMyMusic →</a>
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>SiriusXM The Highway — Top 50 Most Played</h3>
+        <div class="sub">30-day airplay, via xmplaylist.com (fan-run proxy)</div>
+      </div>
+      <a class="csv-btn" href="data:text/csv;charset=utf-8,Rank%2CTitle%2CArtist%2CTimesPlayed_30Days%0D%0A1%2CCarry%20On%2CKenny%20Chesney%2C275%0D%0A2%2CRethink%20Some%20Things%2CLuke%20Combs%2C271%0D%0A3%2CBet%20On%20That%2CBlake%20Whiten%2C267%0D%0A4%2CSay%20So%2CDan%20%2B%20Shay%2C250%0D%0A5%2CSomething%20To%20Lose%20%28feat.%20Vincent%20Mason%29%2CStella%20Lefty%2C247%0D%0A6%2CNo%20Need%20For%20Leavin%27%2CKameron%20Marlowe%2C246%0D%0A7%2CMy%20Way%2CRiley%20Green%2C240%0D%0A8%2CHere%2C%22Mumford%20%26%20Sons%2C%20Chris%20Stapleton%22%2C224%0D%0A9%2C%22Phone%2C%20Keys%2C%20Wallet%22%2C%22Lainey%20Wilson%2C%20John%20Mayer%22%2C224%0D%0A10%2CSunburn%2CTucker%20Wetmore%2C224%0D%0A11%2CBeen%20By%20Now%2CMorgan%20Wallen%2C223%0D%0A12%2CEmpty%20Words%2CCorey%20Kent%2C223%0D%0A13%2CNever%20Comin%27%20Back%2CFlatland%20Cavalry%2C212%0D%0A14%2CMedicine%2CMegan%20Moroney%2C206%0D%0A15%2CRunnin%27%20On%20E%2CWyatt%20Flores%2C203%0D%0A16%2CHurts%20Like%20You%2CKoe%20Wetzel%2C202%0D%0A17%2CWreck%20My%20Night%2CLakeview%2C201%0D%0A18%2CBorn%20To%20Be%20Yours%2CWarren%20Zeiders%2C182%0D%0A19%2CString%20By%2CMack%20Geiger%2C181%0D%0A20%2CIf%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%2C%22Carly%20Pearce%2C%20Riley%20Green%22%2C174%0D%0A21%2CAnother%20Drink%2C%22Marshmello%2C%20Kelsea%20Ballerini%22%2C170%0D%0A22%2CPainted%20You%20Pretty%2CHudson%20Westbrook%2C168%0D%0A23%2CWannabe%2CGavin%20Adcock%2C168%0D%0A24%2CBlame%20Texas%2CCody%20Johnson%2C164%0D%0A25%2CDon%27t%20Tell%20On%20Me%2CJason%20Aldean%2C153%0D%0A26%2CI%20Cant%20Love%20You%20Anymore%2C%22Ella%20Langley%2C%20Morgan%20Wallen%22%2C148%0D%0A27%2CBoston%2CSTELLA%20LEFTY%2C146%0D%0A28%2CLoving%20Life%20Again%2CElla%20Langley%2C140%0D%0A29%2CDone%20For%2CMax%20McNown%2C139%0D%0A30%2CHands%20Up%2CJelly%20Roll%2C137%0D%0A31%2CDear%20Big%20City%20%28Edit%29%2CDylan%20Scott%2C134%0D%0A32%2CBlood%20Runs%20Thicker%2CAvery%20Anna%2C125%0D%0A33%2CMexico%20Honey%2CKacey%20Musgraves%2C119%0D%0A34%2CWhat%20Took%20You%20So%20Long%2CJacob%20Hackworth%2C116%0D%0A35%2CCrisco%2CMiranda%20Lambert%2C115%0D%0A36%2CNothin%27%20Better%20To%20Do%2C%22Carter%20Faith%2C%20Wyatt%20Flores%22%2C115%0D%0A37%2CLike%20God%20Intended%2CJordan%20Davis%2C96%0D%0A38%2CGet%20To%20Drinkin%27%2CZach%20John%20King%2C94%0D%0A39%2CLove%20is%20Blind%2CIan%20Munsick%2C94%0D%0A40%2CWoman%2CKane%20Brown%2C93%0D%0A41%2CBe%20By%20You%2CLuke%20Combs%2C86%0D%0A42%2CDemons%20In%20Your%20Choir%2CThe%20Red%20Clay%20Strays%2C86%0D%0A43%2CHorseback%2CCody%20Johnson%2C86%0D%0A44%2CLet%20It%20Go%2CJordan%20Davis%2C80%0D%0A45%2CWould%20U%20Still%20Love%20Me%2CDiplo%20%26%20Cameron%20Whitcomb%2C79%0D%0A46%2CBar%20And%20Back%2CJosh%20Ross%2C78%0D%0A47%2CBorn%20To%20Die%2CShaboozey%2C76%0D%0A48%2CBe%20Her%2CElla%20Langley%2C75%0D%0A49%2CNever%20Been%20In%20Love%2CLauren%20Alaina%20%26%20Kane%20Brown%2C66%0D%0A50%2CWho%20Told%20You%20That%2CTucker%20Wetmore%2C61%0D%0A" download="highway_top50_2026-08-18.csv">⬇ Download CSV</a>
     </div>
-  </section>
+    <table>
+      <tbody>
+        
+        <tr>
+          <td class="rank">1</td>
+          <td class="song"><div class="title">Carry On</div><div class="artist">Kenny Chesney</div></td>
+          <td class="plays">275</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Carry%20On%20Kenny%20Chesney" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">2</td>
+          <td class="song"><div class="title">Rethink Some Things</div><div class="artist">Luke Combs</div></td>
+          <td class="plays">271</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Rethink%20Some%20Things%20Luke%20Combs" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">3</td>
+          <td class="song"><div class="title">Bet On That</div><div class="artist">Blake Whiten</div></td>
+          <td class="plays">267</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Bet%20On%20That%20Blake%20Whiten" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">4</td>
+          <td class="song"><div class="title">Say So</div><div class="artist">Dan + Shay</div></td>
+          <td class="plays">250</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Say%20So%20Dan%20%2B%20Shay" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">5</td>
+          <td class="song"><div class="title">Something To Lose (feat. Vincent Mason)</div><div class="artist">Stella Lefty</div></td>
+          <td class="plays">247</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Something%20To%20Lose%20%28feat.%20Vincent%20Mason%29%20Stella%20Lefty" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">6</td>
+          <td class="song"><div class="title">No Need For Leavin'</div><div class="artist">Kameron Marlowe</div></td>
+          <td class="plays">246</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/No%20Need%20For%20Leavin%27%20Kameron%20Marlowe" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">7</td>
+          <td class="song"><div class="title">My Way</div><div class="artist">Riley Green</div></td>
+          <td class="plays">240</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/My%20Way%20Riley%20Green" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">8</td>
+          <td class="song"><div class="title">Here</div><div class="artist">Mumford &amp; Sons, Chris Stapleton</div></td>
+          <td class="plays">224</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Here%20Mumford%20%26%20Sons%2C%20Chris%20Stapleton" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">9</td>
+          <td class="song"><div class="title">Phone, Keys, Wallet</div><div class="artist">Lainey Wilson, John Mayer</div></td>
+          <td class="plays">224</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Phone%2C%20Keys%2C%20Wallet%20Lainey%20Wilson%2C%20John%20Mayer" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">10</td>
+          <td class="song"><div class="title">Sunburn</div><div class="artist">Tucker Wetmore</div></td>
+          <td class="plays">224</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Sunburn%20Tucker%20Wetmore" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">11</td>
+          <td class="song"><div class="title">Been By Now</div><div class="artist">Morgan Wallen</div></td>
+          <td class="plays">223</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Been%20By%20Now%20Morgan%20Wallen" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">12</td>
+          <td class="song"><div class="title">Empty Words</div><div class="artist">Corey Kent</div></td>
+          <td class="plays">223</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Empty%20Words%20Corey%20Kent" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">13</td>
+          <td class="song"><div class="title">Never Comin' Back</div><div class="artist">Flatland Cavalry</div></td>
+          <td class="plays">212</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Never%20Comin%27%20Back%20Flatland%20Cavalry" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">14</td>
+          <td class="song"><div class="title">Medicine</div><div class="artist">Megan Moroney</div></td>
+          <td class="plays">206</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Medicine%20Megan%20Moroney" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">15</td>
+          <td class="song"><div class="title">Runnin' On E</div><div class="artist">Wyatt Flores</div></td>
+          <td class="plays">203</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Runnin%27%20On%20E%20Wyatt%20Flores" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">16</td>
+          <td class="song"><div class="title">Hurts Like You</div><div class="artist">Koe Wetzel</div></td>
+          <td class="plays">202</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Hurts%20Like%20You%20Koe%20Wetzel" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">17</td>
+          <td class="song"><div class="title">Wreck My Night</div><div class="artist">Lakeview</div></td>
+          <td class="plays">201</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Wreck%20My%20Night%20Lakeview" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">18</td>
+          <td class="song"><div class="title">Born To Be Yours</div><div class="artist">Warren Zeiders</div></td>
+          <td class="plays">182</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Born%20To%20Be%20Yours%20Warren%20Zeiders" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">19</td>
+          <td class="song"><div class="title">String By</div><div class="artist">Mack Geiger</div></td>
+          <td class="plays">181</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/String%20By%20Mack%20Geiger" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">20</td>
+          <td class="song"><div class="title">If I Don't Leave I'm Gonna Stay</div><div class="artist">Carly Pearce, Riley Green</div></td>
+          <td class="plays">174</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/If%20I%20Don%27t%20Leave%20I%27m%20Gonna%20Stay%20Carly%20Pearce%2C%20Riley%20Green" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">21</td>
+          <td class="song"><div class="title">Another Drink</div><div class="artist">Marshmello, Kelsea Ballerini</div></td>
+          <td class="plays">170</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Another%20Drink%20Marshmello%2C%20Kelsea%20Ballerini" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">22</td>
+          <td class="song"><div class="title">Painted You Pretty</div><div class="artist">Hudson Westbrook</div></td>
+          <td class="plays">168</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Painted%20You%20Pretty%20Hudson%20Westbrook" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">23</td>
+          <td class="song"><div class="title">Wannabe</div><div class="artist">Gavin Adcock</div></td>
+          <td class="plays">168</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Wannabe%20Gavin%20Adcock" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">24</td>
+          <td class="song"><div class="title">Blame Texas</div><div class="artist">Cody Johnson</div></td>
+          <td class="plays">164</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Blame%20Texas%20Cody%20Johnson" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">25</td>
+          <td class="song"><div class="title">Don't Tell On Me</div><div class="artist">Jason Aldean</div></td>
+          <td class="plays">153</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Don%27t%20Tell%20On%20Me%20Jason%20Aldean" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">26</td>
+          <td class="song"><div class="title">I Cant Love You Anymore</div><div class="artist">Ella Langley, Morgan Wallen</div></td>
+          <td class="plays">148</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/I%20Cant%20Love%20You%20Anymore%20Ella%20Langley%2C%20Morgan%20Wallen" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">27</td>
+          <td class="song"><div class="title">Boston</div><div class="artist">STELLA LEFTY</div></td>
+          <td class="plays">146</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Boston%20STELLA%20LEFTY" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">28</td>
+          <td class="song"><div class="title">Loving Life Again</div><div class="artist">Ella Langley</div></td>
+          <td class="plays">140</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Loving%20Life%20Again%20Ella%20Langley" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">29</td>
+          <td class="song"><div class="title">Done For</div><div class="artist">Max McNown</div></td>
+          <td class="plays">139</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Done%20For%20Max%20McNown" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">30</td>
+          <td class="song"><div class="title">Hands Up</div><div class="artist">Jelly Roll</div></td>
+          <td class="plays">137</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Hands%20Up%20Jelly%20Roll" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">31</td>
+          <td class="song"><div class="title">Dear Big City (Edit)</div><div class="artist">Dylan Scott</div></td>
+          <td class="plays">134</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Dear%20Big%20City%20%28Edit%29%20Dylan%20Scott" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">32</td>
+          <td class="song"><div class="title">Blood Runs Thicker</div><div class="artist">Avery Anna</div></td>
+          <td class="plays">125</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Blood%20Runs%20Thicker%20Avery%20Anna" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">33</td>
+          <td class="song"><div class="title">Mexico Honey</div><div class="artist">Kacey Musgraves</div></td>
+          <td class="plays">119</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Mexico%20Honey%20Kacey%20Musgraves" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">34</td>
+          <td class="song"><div class="title">What Took You So Long</div><div class="artist">Jacob Hackworth</div></td>
+          <td class="plays">116</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/What%20Took%20You%20So%20Long%20Jacob%20Hackworth" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">35</td>
+          <td class="song"><div class="title">Crisco</div><div class="artist">Miranda Lambert</div></td>
+          <td class="plays">115</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Crisco%20Miranda%20Lambert" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">36</td>
+          <td class="song"><div class="title">Nothin' Better To Do</div><div class="artist">Carter Faith, Wyatt Flores</div></td>
+          <td class="plays">115</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Nothin%27%20Better%20To%20Do%20Carter%20Faith%2C%20Wyatt%20Flores" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">37</td>
+          <td class="song"><div class="title">Like God Intended</div><div class="artist">Jordan Davis</div></td>
+          <td class="plays">96</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Like%20God%20Intended%20Jordan%20Davis" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">38</td>
+          <td class="song"><div class="title">Get To Drinkin'</div><div class="artist">Zach John King</div></td>
+          <td class="plays">94</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Get%20To%20Drinkin%27%20Zach%20John%20King" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">39</td>
+          <td class="song"><div class="title">Love is Blind</div><div class="artist">Ian Munsick</div></td>
+          <td class="plays">94</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Love%20is%20Blind%20Ian%20Munsick" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">40</td>
+          <td class="song"><div class="title">Woman</div><div class="artist">Kane Brown</div></td>
+          <td class="plays">93</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Woman%20Kane%20Brown" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">41</td>
+          <td class="song"><div class="title">Be By You</div><div class="artist">Luke Combs</div></td>
+          <td class="plays">86</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Be%20By%20You%20Luke%20Combs" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">42</td>
+          <td class="song"><div class="title">Demons In Your Choir</div><div class="artist">The Red Clay Strays</div></td>
+          <td class="plays">86</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Demons%20In%20Your%20Choir%20The%20Red%20Clay%20Strays" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">43</td>
+          <td class="song"><div class="title">Horseback</div><div class="artist">Cody Johnson</div></td>
+          <td class="plays">86</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Horseback%20Cody%20Johnson" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">44</td>
+          <td class="song"><div class="title">Let It Go</div><div class="artist">Jordan Davis</div></td>
+          <td class="plays">80</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Let%20It%20Go%20Jordan%20Davis" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">45</td>
+          <td class="song"><div class="title">Would U Still Love Me</div><div class="artist">Diplo &amp; Cameron Whitcomb</div></td>
+          <td class="plays">79</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Would%20U%20Still%20Love%20Me%20Diplo%20%26%20Cameron%20Whitcomb" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">46</td>
+          <td class="song"><div class="title">Bar And Back</div><div class="artist">Josh Ross</div></td>
+          <td class="plays">78</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Bar%20And%20Back%20Josh%20Ross" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">47</td>
+          <td class="song"><div class="title">Born To Die</div><div class="artist">Shaboozey</div></td>
+          <td class="plays">76</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Born%20To%20Die%20Shaboozey" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">48</td>
+          <td class="song"><div class="title">Be Her</div><div class="artist">Ella Langley</div></td>
+          <td class="plays">75</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Be%20Her%20Ella%20Langley" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">49</td>
+          <td class="song"><div class="title">Never Been In Love</div><div class="artist">Lauren Alaina &amp; Kane Brown</div></td>
+          <td class="plays">66</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Never%20Been%20In%20Love%20Lauren%20Alaina%20%26%20Kane%20Brown" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+        <tr>
+          <td class="rank">50</td>
+          <td class="song"><div class="title">Who Told You That</div><div class="artist">Tucker Wetmore</div></td>
+          <td class="plays">61</td>
+          <td class="listen"><a class="listen-btn" href="https://music.amazon.com/search/Who%20Told%20You%20That%20Tucker%20Wetmore" target="_blank" rel="noopener">▶ Listen</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-
-<footer>Dark Skies Consulting · Music Division · built for internal use</footer>
-
-<script>
-const bobbyBones = [
-  ["I Can't Love You Anymore", "Ella Langley & Morgan Wallen"],
-  ["Don't We", "Morgan Wallen"],
-  ["Be By You", "Luke Combs"],
-  ["Chevy Silverado", "Bailey Zimmerman"],
-  ["Don't Tell On Me", "Jason Aldean"],
-  ["I Knew It, I Knew You", "Taylor Swift"],
-  ["Woman", "Kane Brown"],
-  ["Boston", "Stella Lefty"],
-  ["Carry On", "Kenny Chesney"],
-  ["Kid Myself", "John Morgan"],
-  ["Ride, Ride, Ride", "George Birge & Luke Bryan"],
-  ["Country And She Knows It", "Luke Bryan"],
-  ["Hate How You Look", "Josh Ross"],
-  ["Be Her", "Ella Langley"],
-  ["McArthur", "HARDY, Eric Church, Morgan Wallen & Tim McGraw"],
-  ["All My Exes", "Lauren Alaina feat. Chase Matthew"],
-  ["Phone, Keys, Wallet", "Lainey Wilson feat. John Mayer"],
-  ["Get To Drinkin'", "Zach John King"],
-  ["Say So", "Dan + Shay"],
-  ["Think As You Drunk", "Riley Green"],
-  ["Boots Off", "Jon Pardi"],
-  ["Hands Up", "Jelly Roll"],
-  ["Been By Now", "Morgan Wallen"],
-  ["Let Him In Anyway", "Blake Shelton"],
-  ["Painted You Pretty", "Hudson Westbrook"],
-  ["Water At A Wedding", "Greylan James"],
-  ["South Of Sanity", "Zach Top"],
-  ["Easy To Love", "Dustin Lynch"],
-  ["Straight For The Heart", "Alexandra Kay"],
-  ["Worth Your Wild", "Russell Dickerson"]
-];
-
-const highwayTop50 = [
-  ["Carry On", "Kenny Chesney", 275],
-  ["Rethink Some Things", "Luke Combs", 270],
-  ["Bet On That", "Blake Whiten", 267],
-  ["Say So", "Dan + Shay", 250],
-  ["Something To Lose (feat. Vincent Mason)", "Stella Lefty", 247],
-  ["No Need For Leavin'", "Kameron Marlowe", 246],
-  ["My Way", "Riley Green", 241],
-  ["Phone, Keys, Wallet", "Lainey Wilson, John Mayer", 225],
-  ["Empty Words", "Corey Kent", 224],
-  ["Here", "Mumford & Sons, Chris Stapleton", 224],
-  ["Sunburn", "Tucker Wetmore", 224],
-  ["Been By Now", "Morgan Wallen", 222],
-  ["Never Comin' Back", "Flatland Cavalry", 212],
-  ["Medicine", "Megan Moroney", 206],
-  ["Runnin' On E", "Wyatt Flores", 203],
-  ["Hurts Like You", "Koe Wetzel", 202],
-  ["Wreck My Night", "Lakeview", 201],
-  ["Born To Be Yours", "Warren Zeiders", 182],
-  ["String By", "Mack Geiger", 181],
-  ["If I Don't Leave I'm Gonna Stay", "Carly Pearce, Riley Green", 174],
-  ["Another Drink", "Marshmello, Kelsea Ballerini", 170],
-  ["Painted You Pretty", "Hudson Westbrook", 168],
-  ["Wannabe", "Gavin Adcock", 168],
-  ["Blame Texas", "Cody Johnson", 164],
-  ["Don't Tell On Me", "Jason Aldean", 153],
-  ["I Cant Love You Anymore", "Ella Langley, Morgan Wallen", 148],
-  ["Boston", "STELLA LEFTY", 145],
-  ["Loving Life Again", "Ella Langley", 140],
-  ["Done For", "Max McNown", 139],
-  ["Hands Up", "Jelly Roll", 137],
-  ["Dear Big City (Edit)", "Dylan Scott", 134],
-  ["Blood Runs Thicker", "Avery Anna", 125],
-  ["Mexico Honey", "Kacey Musgraves", 119],
-  ["What Took You So Long", "Jacob Hackworth", 116],
-  ["Nothin' Better To Do", "Carter Faith, Wyatt Flores", 115],
-  ["Crisco", "Miranda Lambert", 114],
-  ["Like God Intended", "Jordan Davis", 96],
-  ["Get To Drinkin'", "Zach John King", 94],
-  ["Love is Blind", "Ian Munsick", 94],
-  ["Woman", "Kane Brown", 93],
-  ["Be By You", "Luke Combs", 86],
-  ["Demons In Your Choir", "The Red Clay Strays", 86],
-  ["Horseback", "Cody Johnson", 85],
-  ["Let It Go", "Jordan Davis", 80],
-  ["Bar And Back", "Josh Ross", 79],
-  ["Would U Still Love Me", "Diplo & Cameron Whitcomb", 79],
-  ["Born To Die", "Shaboozey", 76],
-  ["Be Her", "Ella Langley", 75],
-  ["Never Been In Love", "Lauren Alaina & Kane Brown", 66],
-  ["Who Told You That", "Tucker Wetmore", 61]
-];
-
-function amazonSearchUrl(title, artist){
-  const q = `${title} ${artist}`.replace(/\s+/g, ' ').trim();
-  return "https://music.amazon.com/search/" + encodeURIComponent(q);
-}
-
-const bobbyRowsEl = document.getElementById('bobby-rows');
-bobbyBones.forEach((song, i) => {
-  const [title, artist] = song;
-  const row = document.createElement('div');
-  row.className = 'row';
-  row.innerHTML = `
-    <div class="rank">#${i+1}</div>
-    <div class="song">
-      <div class="title">${title}</div>
-      <div class="artist">${artist}</div>
-    </div>
-    <span></span>
-    <a class="listen" href="${amazonSearchUrl(title, artist)}" target="_blank" rel="noopener">▶ Listen</a>
-  `;
-  bobbyRowsEl.appendChild(row);
-});
-
-const highwayRowsEl = document.getElementById('highway-rows');
-highwayTop50.forEach((song, i) => {
-  const [title, artist, plays] = song;
-  const row = document.createElement('div');
-  row.className = 'row';
-  row.innerHTML = `
-    <div class="rank">#${i+1}</div>
-    <div class="song">
-      <div class="title">${title}</div>
-      <div class="artist">${artist}</div>
-    </div>
-    <div class="plays">${plays} plays</div>
-    <a class="listen" href="${amazonSearchUrl(title, artist)}" target="_blank" rel="noopener">▶ Listen</a>
-  `;
-  highwayRowsEl.appendChild(row);
-});
-
-// Build CSV downloads as data URIs so this page stays self-contained
-function toCsvRow(vals){
-  return vals.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",");
-}
-
-const bobbyCsv = "Rank,Title,Artist\n" + bobbyBones.map((s, i) =>
-  toCsvRow([i+1, s[0], s[1]])
-).join("\n");
-document.getElementById('csv-download-bobby').href =
-  "data:text/csv;charset=utf-8," + encodeURIComponent(bobbyCsv);
-
-const highwayCsv = "Rank,Title,Artist,TimesPlayed_30Days\n" + highwayTop50.map((s, i) =>
-  toCsvRow([i+1, s[0], s[1], s[2]])
-).join("\n");
-document.getElementById('csv-download-highway').href =
-  "data:text/csv;charset=utf-8," + encodeURIComponent(highwayCsv);
-</script>
-
+<footer>
+  Sources: bobbybones.iheart.com (Country Top 30 With Bobby Bones) · xmplaylist.com/station/thehighway/most-heard (SiriusXM Ch. 56 fan-run tracker)
+</footer>
 </body>
 </html>
